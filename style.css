@@ -1,109 +1,72 @@
-/* reset rapido */
+/* reset base */
 * { box-sizing: border-box; margin:0; padding:0; }
-
 body {
-  font-family: sans-serif;
   background: #111;
   color: #eee;
-  max-width: 960px;
-  margin: auto;
+  font-family: sans-serif;
   padding: 16px;
+  max-width: 800px;
+  margin: auto;
 }
-
-header h1 {
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-nav#menu {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-nav#menu button {
-  padding: 8px 16px;
-  background: #0077cc;
+h1, h2 { text-align: center; margin-bottom: 16px; }
+hr { border-color: #444; margin: 16px 0; }
+.nav { text-align: center; margin-bottom: 16px; }
+.nav button {
+  background: #007acc;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  padding: 8px 16px;
+  margin: 0 4px 8px;
   cursor: pointer;
+  border-radius: 4px;
 }
+.nav button:hover { background: #005fa3; }
 
-nav#menu button:hover {
-  background: #005fa3;
-}
-
-section {
-  display: none;
-}
-
-section.active {
-  display: block;
-}
-
-section h2 {
-  margin-bottom: 12px;
-}
+.hidden { display: none; }
 
 .chart-container {
   background: #222;
   padding: 16px;
+  margin: 16px auto;
   border-radius: 8px;
-  margin-bottom: 24px;
 }
 
-form#form-dip {
+#listSection form { margin-bottom: 16px; }
+#listSection .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
-
-form#form-dip input {
+#listSection input {
   padding: 8px;
-  border: 1px solid #444;
   border-radius: 4px;
+  border: 1px solid #444;
   background: #222;
   color: #eee;
 }
-
-form#form-dip button {
-  grid-column: 1/-1;
-  padding: 10px;
-  background: #0077cc;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+#btnAdd {
+  background: #007acc; color:#fff; border:none;
+  padding: 8px 16px; border-radius:4px; cursor:pointer;
 }
-
-form#form-dip button:hover {
-  background: #005fa3;
-}
+#btnAdd:hover { background:#005fa3; }
 
 table {
-  width: 100%;
+  width:100%;
   border-collapse: collapse;
-  background: #222;
+  margin-top: 8px;
 }
-
-table th, table td {
-  border: 1px solid #444;
+th, td {
+  border:1px solid #444;
   padding: 8px;
   text-align: left;
 }
-
-table th {
-  background: #333;
-}
-
-button.del-btn {
-  padding: 4px 8px;
-  background: #cc0000;
-  border: none;
+.del-btn {
+  background: #c0392b;
   color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
+  border:none;
+  padding:4px 8px;
+  border-radius:4px;
+  cursor:pointer;
 }
+.del-btn:hover { background:#a02822; }
