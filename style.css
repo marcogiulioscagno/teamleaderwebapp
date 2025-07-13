@@ -1,5 +1,6 @@
-/* reset di base */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* reset rapido */
+* { box-sizing: border-box; margin:0; padding:0; }
+
 body {
   font-family: sans-serif;
   background: #111;
@@ -8,79 +9,101 @@ body {
   margin: auto;
   padding: 16px;
 }
+
 header h1 {
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
-nav {
+
+nav#menu {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
-.nav-button {
-  background: #0077cc;
-  border: none;
-  color: white;
+
+nav#menu button {
   padding: 8px 16px;
+  background: #0077cc;
+  color: #fff;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
 }
-.nav-button.active {
+
+nav#menu button:hover {
   background: #005fa3;
 }
-section { display: none; }
-section.active { display: block; }
+
+section {
+  display: none;
+}
+
+section.active {
+  display: block;
+}
+
 section h2 {
   margin-bottom: 12px;
 }
-#charts {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-.chart-card {
+
+.chart-container {
   background: #222;
-  padding: 12px;
+  padding: 16px;
   border-radius: 8px;
+  margin-bottom: 24px;
 }
-form#formAdd {
+
+form#form-dip {
   display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
   gap: 8px;
   margin-bottom: 16px;
 }
-form#formAdd input {
+
+form#form-dip input {
   padding: 8px;
+  border: 1px solid #444;
   border-radius: 4px;
-  border: 1px solid #555;
   background: #222;
   color: #eee;
 }
-form#formAdd button {
-  grid-column: span 2;
-  padding: 8px;
+
+form#form-dip button {
+  grid-column: 1/-1;
+  padding: 10px;
   background: #0077cc;
+  color: #fff;
   border: none;
-  color: white;
   border-radius: 4px;
   cursor: pointer;
 }
+
+form#form-dip button:hover {
+  background: #005fa3;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 8px;
+  background: #222;
 }
+
 table th, table td {
   border: 1px solid #444;
   padding: 8px;
   text-align: left;
 }
-button.delete {
-  background: #cc3300;
-  border: none;
-  color: white;
+
+table th {
+  background: #333;
+}
+
+button.del-btn {
   padding: 4px 8px;
+  background: #cc0000;
+  border: none;
+  color: #fff;
   border-radius: 4px;
   cursor: pointer;
 }
