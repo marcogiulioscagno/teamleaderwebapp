@@ -7,12 +7,14 @@ const sb = supabase.createClient(supabaseUrl, supabaseKey);
 const COLORS = ['#3366cc','#dc3912','#ff9900','#109618','#990099','#0099c6','#dd4477','#66aa00','#b82e2e','#316395'];
 
 // ——— NAVIGAZIONE ———
-document.querySelectorAll('nav button').forEach(btn => {
+document.querySelectorAll('button[data-sec]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.sec').forEach(sec=>sec.classList.remove('active'));
-    document.getElementById('sezione-' + btn.dataset.sec).classList.add('active');
+    // nascondi tutte le sezioni
+    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+    // mostra quella cliccata
+    const sec = document.getElementById('sezione-' + btn.dataset.sec);
+    sec.classList.add('active');
+    // se era Statistiche, ricalcola
     if (btn.dataset.sec === 'statistiche') renderStats();
   });
 });
@@ -62,16 +64,14 @@ async function loadTable() {
     </tr>`).join('');
   document.querySelectorAll('.delete-btn').forEach(btn=>{
     btn.onclick = async ()=>{
-      if(!confirm('Confermi eliminazione?')) return;
+      if (!confirm('Confermi eliminazione?')) return;
       const { error } = await sb.from('application_specialists')
         .delete().eq('id',btn.dataset.id);
-      if(error) return alert('Errore cancellazione: '+error.message);
+      if (error) return alert('Errore cancellazione: '+error.message);
       loadTable();
     };
   });
 }
-
-// inizializza elenco
 window.addEventListener('DOMContentLoaded', loadTable);
 
 // ——— STATISTICHE ———
@@ -81,7 +81,6 @@ async function renderStats() {
     .select('*');
   if (error) return console.error(error);
 
-  // helper conteggi
   const countBy = (arr, fn) =>
     arr.reduce((acc,x)=>{
       const k = fn(x) || '—';
@@ -89,7 +88,6 @@ async function renderStats() {
       return acc;
     },{});
 
-  // prepara dati
   const stats = {
     contratto: countBy(data, r=>r.contratto),
     sede:       countBy(data, r=>r.sede),
@@ -98,7 +96,6 @@ async function renderStats() {
     clienti:    countBy(data, r=>Array.isArray(r.clienti)?r.clienti.join(', '):r.clienti)
   };
 
-  // crea i chart
   createPie('chart-contratto','AS per Contratto', stats.contratto);
   createPie('chart-sede','AS per Sede', stats.sede);
   createPie('chart-team','AS per Team', stats.team);
@@ -111,7 +108,6 @@ function createPie(canvasId, title, counts) {
   const labels = Object.keys(counts);
   const values = Object.values(counts);
   const bg = labels.map((_,i)=>COLORS[i % COLORS.length]);
-  // distruggi chart precedente se esiste
   if (ctx.chart) ctx.chart.destroy();
   ctx.chart = new Chart(ctx, {
     type: 'pie',
