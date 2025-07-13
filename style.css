@@ -1,89 +1,97 @@
 /* reset */
-*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+* { box-sizing: border-box; margin:0; padding:0; }
 
+/* layout generale */
 body {
   font-family: sans-serif;
   background: #111;
   color: #eee;
-  line-height: 1.5;
+  padding: 16px;
 }
-
-header { text-align: center; padding: 1rem; }
-header h1 { font-size: 1.8rem; margin-bottom: .5rem; }
-
+header h1 {
+  text-align: center;
+  margin-bottom: 16px;
+}
 nav {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: .5rem;
-  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
 }
-
 nav button {
-  background: #0077cc;
+  background: #0066cc;
   color: #fff;
   border: none;
-  padding: .6rem 1rem;
+  padding: 8px 14px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: .9rem;
 }
-nav button:hover { background: #005fa3; }
+nav button:hover { background: #005bb5; }
 
-main > section {
-  display: none;
-  padding: 1rem;
-}
-main > section.active {
-  display: block;
+.hidden { display: none; }
+
+main section {
+  max-width: 960px;
+  margin: auto;
 }
 
-.form {
+/* Elenco AS */
+.form-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-  margin-bottom: 1rem;
+  gap: 8px;
+  margin-bottom: 12px;
 }
-.form input {
-  flex: 1 1 calc(33% - .5rem);
-  padding: .5rem;
+.form-row input {
+  flex: 1;
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #444;
   background: #222;
   color: #fff;
-  border: 1px solid #444;
-  border-radius: 4px;
 }
-.form button {
-  flex: 1 1 100%;
-  padding: .7rem;
-  background: #0077cc;
+#btnAdd {
+  display: block;
+  margin: 0 auto 16px;
+  background: #0088ff;
   color: #fff;
   border: none;
+  padding: 10px 16px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
 }
+#btnAdd:hover { background: #0077dd; }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
+  margin-top: 16px;
 }
-th, td {
-  border: 1px solid #333;
-  padding: .5rem;
+table th, table td {
+  border: 1px solid #444;
+  padding: 6px;
   text-align: left;
-  font-size: .9rem;
 }
-th { background: #222; }
-
-.charts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-.charts canvas {
-  background: #222;
+table td button {
+  background: #cc0000;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
   border-radius: 4px;
-  padding: .5rem;
+  cursor: pointer;
+}
+table td button:hover { background: #aa0000; }
+
+/* Statistiche */
+.chart-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.chart-row canvas {
+  background: #222;
+  border-radius: 8px;
+  max-width: 300px;
 }
