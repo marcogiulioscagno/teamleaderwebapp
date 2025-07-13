@@ -2,91 +2,86 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Gestionale Team Leader</title>
-  <!-- CSS principale -->
   <link rel="stylesheet" href="style.css" />
-  <!-- Supabase JS client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/bundle.min.js"></script>
-  <!-- Il tuo script -->
-  <script defer src="script.js"></script>
+  <!-- Supabase client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Chart.js per i grafici -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
     <h1>GESTIONALE TEAM LEADER</h1>
     <nav>
-      <button data-sec="home" class="active">HOME</button>
-      <button data-sec="elenco">ELENCO AS</button>
-      <button data-sec="statistiche">STATISTICHE</button>
-      <button data-sec="reperibilita">REPERIBILITÀ</button>
-      <button data-sec="straordinari">STRAORDINARI</button>
-      <button data-sec="indennita">INDENNITÀ</button>
+      <button data-section="home">HOME</button>
+      <button data-section="list">ELENCO AS</button>
+      <button data-section="stats">STATISTICHE</button>
+      <button data-section="reperibilita">REPERIBILITÀ</button>
+      <button data-section="straordinari">STRAORDINARI</button>
+      <button data-section="indennita">INDENNITÀ</button>
     </nav>
   </header>
 
   <main>
-    <!-- Sezione HOME -->
-    <section id="home" class="active">
+    <!-- HOME -->
+    <section id="home" class="section">
       <p>Benvenuto nel gestionale Team Leader. Usa il menu per navigare.</p>
     </section>
 
-    <!-- Sezione ELENCO AS -->
-    <section id="elenco">
+    <!-- ELENCO AS -->
+    <section id="list" class="section hidden">
       <h2>Elenco Application Specialists</h2>
-      <div class="form-row">
-        <input id="fNome"      placeholder="Nome"     />
-        <input id="fCognome"   placeholder="Cognome"  />
-        <input id="fTeam"      placeholder="Team"     />
-        <input id="fRuolo"     placeholder="Ruolo"    />
-        <input id="fSede"      placeholder="Sede"     />
-        <input id="fContratto" placeholder="Contratto"/>
-        <input id="fAmbito"    placeholder="Ambito (csv)"/>
-        <input id="fClienti"   placeholder="Clienti (csv)"/>
-        <input id="fStato"     placeholder="Stato"    />
-        <button id="btnAdd">Aggiungi AS</button>
-      </div>
-      <table>
+      <form id="as-form">
+        <input type="text" id="nome"     placeholder="Nome"     required />
+        <input type="text" id="cognome"  placeholder="Cognome"  required />
+        <input type="text" id="team"     placeholder="Team"     required />
+        <input type="text" id="ruolo"    placeholder="Ruolo"    required />
+        <input type="text" id="sede"     placeholder="Sede"     required />
+        <input type="text" id="contratto"placeholder="Contratto"required />
+        <input type="text" id="ambito"   placeholder="Ambito (csv)"   />
+        <input type="text" id="clienti"  placeholder="Clienti (csv)"  />
+        <input type="text" id="stato"    placeholder="Stato"    />
+        <button type="submit">Aggiungi AS</button>
+      </form>
+      <table id="as-table">
         <thead>
           <tr>
             <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
-            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th><th>Stato</th><th>Azioni</th>
+            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th><th>Stato</th><th>→</th>
           </tr>
         </thead>
-        <tbody id="tblBody">
-          <!-- riempito da script.js -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </section>
 
-    <!-- Sezione STATISTICHE -->
-    <section id="statistiche">
-      <h2>Statistiche</h2>
-      <div class="charts">
-        <canvas id="chartSede"></canvas>
-        <canvas id="chartTeam"></canvas>
-        <canvas id="chartContratto"></canvas>
-        <canvas id="chartAmbito"></canvas>
-        <canvas id="chartClienti"></canvas>
+    <!-- STATISTICHE -->
+    <section id="stats" class="section hidden">
+      <h2>Statistiche AS</h2>
+      <div class="chart-grid">
+        <div><canvas id="chart-sede"></canvas></div>
+        <div><canvas id="chart-team"></canvas></div>
+        <div><canvas id="chart-contratto"></canvas></div>
+        <div><canvas id="chart-ambito"></canvas></div>
+        <div><canvas id="chart-clienti"></canvas></div>
       </div>
     </section>
 
-    <!-- Sezione REPERIBILITÀ -->
-    <section id="reperibilita">
+    <!-- Placeholder per le altre sezioni -->
+    <section id="reperibilita" class="section hidden">
       <h2>Reperibilità</h2>
-      <p>– in costruzione –</p>
+      <p>In costruzione…</p>
     </section>
-
-    <!-- Sezione STRAORDINARI -->
-    <section id="straordinari">
+    <section id="straordinari" class="section hidden">
       <h2>Straordinari</h2>
-      <p>– in costruzione –</p>
+      <p>In costruzione…</p>
     </section>
-
-    <!-- Sezione INDENNITÀ -->
-    <section id="indennita">
+    <section id="indennita" class="section hidden">
       <h2>Indennità</h2>
-      <p>– in costruzione –</p>
+      <p>In costruzione…</p>
     </section>
   </main>
+
+  <script src="script.js"></script>
 </body>
 </html>
