@@ -6,11 +6,11 @@
   <title>Gestionale Team Leader</title>
   <link rel="stylesheet" href="style.css">
 
-  <!-- supabase-js v2 -->
+  <!-- Supabase client (UMD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-  <!-- il tuo script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <!-- il nostro script -->
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -25,7 +25,7 @@
 
   <main>
     <!-- HOME -->
-    <section id="homeSection">
+    <section id="homeSection" class="active">
       <p>Benvenuto nel gestionale Team Leader. Usa il menu per navigare.</p>
     </section>
 
@@ -53,7 +53,7 @@
         <thead>
           <tr>
             <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
-            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th><th>Stato</th><th> </th>
+            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th><th>Stato</th><th>Azioni</th>
           </tr>
         </thead>
         <tbody id="listBody"></tbody>
