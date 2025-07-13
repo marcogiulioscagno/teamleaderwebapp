@@ -1,119 +1,86 @@
-/* reset */
-*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
-
+/* reset di base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: sans-serif;
   background: #111;
   color: #eee;
+  max-width: 960px;
+  margin: auto;
   padding: 16px;
 }
-
-header {
+header h1 {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
-
-h1 {
-  margin-bottom: 12px;
-  font-size: 1.8rem;
-}
-
 nav {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 24px;
 }
-
-nav button {
+.nav-button {
   background: #0077cc;
-  color: #fff;
   border: none;
-  padding: 8px 14px;
+  color: white;
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: .9rem;
 }
-nav button:hover {
+.nav-button.active {
   background: #005fa3;
 }
-
-.hidden { display: none; }
-.active { display: block; }
-
-main section {
-  max-width: 960px;
-  margin: auto;
-}
-
-/* Dipendenti */
-.form-row {
-  display: flex;
-  gap: 8px;
+section { display: none; }
+section.active { display: block; }
+section h2 {
   margin-bottom: 12px;
 }
-.form-row input {
-  flex: 1;
-  padding: 6px;
-  border: 1px solid #444;
-  border-radius: 4px;
-  background: #222;
-  color: #fff;
+#charts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
 }
-#btnAdd {
-  display: block;
-  width: 100%;
-  padding: 10px;
-  background: #0088ff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.chart-card {
+  background: #222;
+  padding: 12px;
+  border-radius: 8px;
+}
+form#formAdd {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+  gap: 8px;
   margin-bottom: 16px;
 }
-#btnAdd:hover {
-  background: #0077dd;
+form#formAdd input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #222;
+  color: #eee;
 }
-
+form#formAdd button {
+  grid-column: span 2;
+  padding: 8px;
+  background: #0077cc;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 8px;
 }
-thead th, tbody td {
+table th, table td {
   border: 1px solid #444;
-  padding: 6px;
-  font-size: .9rem;
+  padding: 8px;
+  text-align: left;
 }
-thead th {
-  background: #222;
-}
-tbody tr:hover {
-  background: #1a1a1a;
-}
-tbody td button {
-  background: #cc0000;
-  color: #fff;
+button.delete {
+  background: #cc3300;
   border: none;
+  color: white;
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-}
-tbody td button:hover {
-  background: #aa0000;
-}
-
-/* Statistiche */
-.chart-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  justify-content: center;
-  margin-top: 24px;
-}
-.chart-row canvas {
-  background: #222;
-  border-radius: 8px;
-  padding: 8px;
-  max-width: 300px;
-  width: 100%;
 }
