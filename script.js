@@ -1,116 +1,150 @@
-// 1) Inizializza Supabase
-  const SUPABASE_URL     = 'https://db.fzbpucvscnfiyimefrvzs.supabase.co';
-  const SUPABASE_ANON_KEY= 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// ==== CONFIGURAZIONE SUPABASE ====
+const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
 
-// — navigation
-const sections = document.querySelectorAll('main > section');
-document.querySelectorAll('nav button').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const target = btn.id.replace('btn-','');
-    sections.forEach(sec => {
-      sec.classList.toggle('active', sec.id === target);
-    });
-    if (target === 'elenco')      loadElenco();
-    else if (target === 'statistiche') loadStatistiche();
-  });
-});
+// ==== NAVIGAZIONE SEZIONI ====
+const homeSec  = document.getElementById('homeSection');
+const listSec  = document.getElementById('listSection');
+const statsSec = document.getElementById('statsSection');
+document.getElementById('btnHome').onclick  = () => showSection(homeSec);
+document.getElementById('btnList').onclick  = () => { showSection(listSec); loadList(); };
+document.getElementById('btnStats').onclick = () => { showSection(statsSec); loadStats(); };
 
-// — ELENCO AS
-async function loadElenco() {
-  const tbody = document.querySelector('#table-as tbody');
-  tbody.innerHTML = '';
-  const { data, error } = await supabase
+function showSection(sec) {
+  [homeSec,listSec,statsSec].forEach(s=>s.classList.add('hidden'));
+  sec.classList.remove('hidden');
+}
+// mostra subito HOME
+showSection(homeSec);
+
+// ==== ELENCO AS CRUD ====
+const inName     = document.getElementById('inName');
+const inSurname  = document.getElementById('inSurname');
+const inTeam     = document.getElementById('inTeam');
+const inRole     = document.getElementById('inRole');
+const inSede     = document.getElementById('inSede');
+const inContract = document.getElementById('inContract');
+const inAmbito   = document.getElementById('inAmbito');
+const inClients  = document.getElementById('inClients');
+const inState    = document.getElementById('inState');
+const listBody   = document.getElementById('listBody');
+document.getElementById('btnAdd').onclick = addAS;
+
+async function loadList() {
+  listBody.innerHTML = '';
+  let { data, error } = await supabase
     .from('application_specialists')
-    .select('*');
+    .select('*')
+    .order('created_at', { ascending: false });
   if (error) return alert(error.message);
-  data.forEach(as => {
+  data.forEach(r => {
     const tr = document.createElement('tr');
-    ['nome','cognome','team','ruolo','sede','contratto','ambito','clienti','stato']
-      .forEach(f => {
-        const td = document.createElement('td');
-        td.textContent = as[f] || '';
-        tr.appendChild(td);
-      });
-    // pulsante elimina
-    const td = document.createElement('td');
-    const btn = document.createElement('button');
-    btn.textContent = 'Elimina';
-    btn.onclick = () => deleteAS(as.id);
-    td.appendChild(btn);
-    tr.appendChild(td);
-    tbody.appendChild(tr);
+    tr.innerHTML = `
+      <td>${r.nome}</td>
+      <td>${r.cognome}</td>
+      <td>${r.team}</td>
+      <td>${r.ruolo}</td>
+      <td>${r.sede}</td>
+      <td>${r.contratto}</td>
+      <td>${r.ambito.join(', ')}</td>
+      <td>${r.clienti.join(', ')}</td>
+      <td>${r.stato}</td>
+      <td><button data-id="${r.id}">X</button></td>
+    `;
+    tr.querySelector('button').onclick = () => delAS(r.id);
+    listBody.appendChild(tr);
   });
 }
 
-// aggiungi nuovo AS
-document.getElementById('btn-add').addEventListener('click', async () => {
-  const record = {};
-  ['nome','cognome','team','ruolo','sede','contratto','ambito','clienti','stato']
-    .forEach(id => record[id] = document.getElementById(id).value);
-  const { error } = await supabase
+async function addAS() {
+  const nuovo = {
+    nome:     inName.value.trim(),
+    cognome:  inSurname.value.trim(),
+    team:     inTeam.value.trim(),
+    ruolo:    inRole.value.trim(),
+    sede:     inSede.value.trim(),
+    contratto:inContract.value.trim(),
+    ambito:   inAmbito.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
+    clienti:  inClients.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
+    stato:    inState.value.trim()
+  };
+  let { error } = await supabase
     .from('application_specialists')
-    .insert(record);
+    .insert(nuovo);
   if (error) return alert(error.message);
-  loadElenco();
-  document.querySelectorAll('.form input').forEach(i => i.value = '');
-});
-
-// elimina AS
-async function deleteAS(id) {
-  if (!confirm('Eliminare questo record?')) return;
-  const { error } = await supabase
-    .from('application_specialists')
-    .delete()
-    .eq('id', id);
-  if (error) return alert(error.message);
-  loadElenco();
+  // pulisci form e ricarica
+  [inName,inSurname,inTeam,inRole,inSede,inContract,inAmbito,inClients,inState]
+    .forEach(i=>i.value='');
+  loadList();
 }
 
-// — STATISTICHE
-async function loadStatistiche() {
-  const { data, error } = await supabase
+async function delAS(id) {
+  if (!confirm('Eliminare questo AS?')) return;
+  let { error } = await supabase
     .from('application_specialists')
-    .select('*');
+    .delete().eq('id', id);
+  if (error) return alert(error.message);
+  loadList();
+}
+
+// ==== STATISTICHE ====
+let charts = {};
+async function loadStats() {
+  // recupero tutti i record
+  let { data, error } = await supabase
+    .from('application_specialists')
+    .select('team,sede,contratto,ambito,clienti');
   if (error) return alert(error.message);
 
-  // helper: conta occorrenze, espande CSV per ambito/clienti
-  const conta = field => {
+  // helper: conta occorrenze
+  function countField(arr, key) {
     const cnt = {};
-    data.forEach(r => {
-      let vals = [r[field]];
-      if (field === 'ambito' || field === 'clienti') {
-        vals = (r[field]||'').split(',').map(x=>x.trim());
-      }
+    arr.forEach(r => {
+      let vals = Array.isArray(r[key]) ? r[key] : [r[key]];
       vals.forEach(v => {
         if (!v) return;
         cnt[v] = (cnt[v]||0) + 1;
       });
     });
     return cnt;
-  };
-
-  // crea grafico a torta
-  function creaGrafico(id, title, counts) {
-    const ctx = document.getElementById(id).getContext('2d');
-    const labels = Object.keys(counts);
-    const dataSet = labels.map(l=>counts[l]);
-    const bg = labels.map((_,i)=>`hsl(${i*360/labels.length},70%,50%)`);
-    new Chart(ctx, {
-      type: 'pie',
-      data: { labels, datasets: [{ label: title, data: dataSet, backgroundColor: bg }] },
-      options:{ plugins:{ legend:{ position:'bottom' }}, responsive:true }
-    });
   }
 
-  creaGrafico('chart-sede',       'AS per Sede',      conta('sede'));
-  creaGrafico('chart-team',       'AS per Team',      conta('team'));
-  creaGrafico('chart-contratto',  'AS per Contratto', conta('contratto'));
-  creaGrafico('chart-ambito',     'AS per Ambito',    conta('ambito'));
-  creaGrafico('chart-clienti',    'AS per Clienti',   conta('clienti'));
+  const stats = {
+    sede:      countField(data,'sede'),
+    team:      countField(data,'team'),
+    contract:  countField(data,'contratto'),
+    ambito:    countField(data,'ambito'),
+    clients:   countField(data,'clienti')
+  };
+
+  // per ogni chart: etichette + dati
+  renderPie('chartSede',     stats.sede,     'AS per Sede');
+  renderPie('chartTeam',     stats.team,     'AS per Team');
+  renderPie('chartContract', stats.contract, 'AS per Contratto');
+  renderPie('chartAmbito',   stats.ambito,   'AS per Ambito');
+  renderPie('chartClients',  stats.clients,  'AS per Clienti');
 }
 
-// — al primo caricamento mostriamo Home
-sections.forEach(sec => {
-  if (sec.id === 'home') sec.classList.add('active');
-});
+function renderPie(canvasId, dataObj, title) {
+  const ctx = document.getElementById(canvasId);
+  const labels = Object.keys(dataObj);
+  const values = Object.values(dataObj);
+  if (charts[canvasId]) charts[canvasId].destroy();
+  charts[canvasId] = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: labels.map((_,i)=>`hsl(${i*360/labels.length},70%,60%)`)
+      }]
+    },
+    options: {
+      plugins: {
+        title: { display: true, text: `${title} (${values.reduce((a,b)=>a+b,0)})` },
+        legend: { position: 'bottom', labels: { color: '#eee' } }
+      }
+    }
+  });
+}
