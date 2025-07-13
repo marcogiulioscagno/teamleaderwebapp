@@ -1,120 +1,110 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // === CONFIGURAZIONE SUPABASE ===
-  const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
-  const sb = supabase.createClient(supabaseUrl, supabaseKey);
+// --- Supabase setup ---
+const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // === SELEZIONE SEZIONI ===
-  const homeSec  = document.getElementById('homeSection');
-  const listSec  = document.getElementById('listSection');
-  const statsSec = document.getElementById('statsSection');
+// --- elementi DOM ---
+const btnDip   = document.getElementById('btn-dipendenti');
+const btnStat  = document.getElementById('btn-statistiche');
+const sezDip   = document.getElementById('sez-dipendenti');
+const sezStat  = document.getElementById('sez-statistiche');
+const tblBody  = document.getElementById('tbl-body');
+const fields   = ['nome','cognome','team','ruolo','sede','contratto','ambito','clienti','stato'];
 
-  // === NAV ===
-  document.getElementById('btnHome').onclick  = () => show(homeSec);
-  document.getElementById('btnList').onclick  = () => { show(listSec); loadList(); };
-  document.getElementById('btnStats').onclick = () => { show(statsSec); loadStats(); };
+// --- navigazione ---
+btnDip.addEventListener('click', ()=> showSection('dip'));
+btnStat.addEventListener('click',()=> showSection('stat'));
 
-  function show(sec) {
-    [homeSec, listSec, statsSec].forEach(s => s.classList.add('hidden'));
-    sec.classList.remove('hidden');
+// al caricamento default statistiche
+showSection('stat');
+loadStatistiche();
+
+function showSection(sec){
+  btnDip.classList.remove('active');
+  btnStat.classList.remove('active');
+  sezDip.classList.add('hidden');
+  sezStat.classList.add('hidden');
+  if(sec==='dip'){
+    btnDip.classList.add('active');
+    sezDip.classList.remove('hidden');
+    loadDipendenti();
+  } else {
+    btnStat.classList.add('active');
+    sezStat.classList.remove('hidden');
+    loadStatistiche();
   }
-  show(homeSec);
+}
 
-  // === ELENCO AS ===
-  const inName     = document.getElementById('inName');
-  const inSurname  = document.getElementById('inSurname');
-  const inTeam     = document.getElementById('inTeam');
-  const inRole     = document.getElementById('inRole');
-  const inSede     = document.getElementById('inSede');
-  const inContract = document.getElementById('inContract');
-  const inAmbito   = document.getElementById('inAmbito');
-  const inClients  = document.getElementById('inClients');
-  const inState    = document.getElementById('inState');
-  const listBody   = document.getElementById('listBody');
-  document.getElementById('btnAdd').onclick = addAS;
+// --- Dipendenti CRUD ---
+document.getElementById('btn-add').onclick = async ()=>{
+  let record = {};
+  fields.forEach(f=> record[f] = document.getElementById(f).value.trim());
+  await sb.from('application_specialists').insert(record);
+  fields.forEach(f=> document.getElementById(f).value='');
+  loadDipendenti();
+};
 
-  async function loadList() {
-    listBody.innerHTML = '';
-    const { data, error } = await sb
-      .from('application_specialists')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) return alert(error.message);
-    data.forEach(r => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.nome}</td><td>${r.cognome}</td><td>${r.team}</td><td>${r.ruolo}</td>
-        <td>${r.sede}</td><td>${r.contratto}</td>
-        <td>${Array.isArray(r.ambito)? r.ambito.join(', '): r.ambito}</td>
-        <td>${Array.isArray(r.clienti)? r.clienti.join(', '): r.clienti}</td>
-        <td>${r.stato}</td>
-        <td><button data-id="${r.id}">X</button></td>
-      `;
-      tr.querySelector('button').onclick = () => deleteAS(r.id);
-      listBody.appendChild(tr);
+async function loadDipendenti(){
+  const { data, error } = await sb.from('application_specialists').select('*');
+  if(error) return alert(error.message);
+  tblBody.innerHTML = '';
+  data.forEach(r=>{
+    let tr = document.createElement('tr');
+    fields.forEach(f=>{
+      let td = document.createElement('td');
+      td.textContent = r[f];
+      tr.appendChild(td);
     });
-  }
-
-  async function addAS() {
-    const nuovo = {
-      nome:       inName.value.trim(),
-      cognome:    inSurname.value.trim(),
-      team:       inTeam.value.trim(),
-      ruolo:      inRole.value.trim(),
-      sede:       inSede.value.trim(),
-      contratto:  inContract.value.trim(),
-      ambito:     inAmbito.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
-      clienti:    inClients.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
-      stato:      inState.value.trim()
+    let tdDel = document.createElement('td');
+    tdDel.innerHTML = `<button data-id="${r.id}">✖</button>`;
+    tr.appendChild(tdDel);
+    tblBody.appendChild(tr);
+  });
+  // elimina
+  tblBody.querySelectorAll('button').forEach(btn=>{
+    btn.onclick = async ()=>{
+      await sb.from('application_specialists').delete().eq('id', btn.dataset.id);
+      loadDipendenti();
     };
-    const { error } = await sb.from('application_specialists').insert(nuovo);
-    if (error) return alert(error.message);
-    [inName,inSurname,inTeam,inRole,inSede,inContract,inAmbito,inClients,inState]
-      .forEach(i=>i.value='');
-    loadList();
+  });
+}
+
+// --- Statistiche e grafici ---
+async function loadStatistiche(){
+  const { data, error } = await sb.from('application_specialists').select('*');
+  if(error) return alert(error.message);
+
+  // helper per contare categorie
+  function conta(key){
+    const map = {};
+    data.forEach(r=>{
+      let vals = (r[key]||'').split(',').map(v=>v.trim()).filter(v=>v);
+      vals.forEach(v=> map[v] = (map[v]||0) + 1);
+    });
+    return map;
   }
 
-  async function deleteAS(id) {
-    if (!confirm('Eliminare questo AS?')) return;
-    const { error } = await sb.from('application_specialists').delete().eq('id', id);
-    if (error) return alert(error.message);
-    loadList();
-  }
-
-  // === STATISTICHE ===
-  const chartMap = {};
-  async function loadStats() {
-    const { data, error } = await sb
-      .from('application_specialists')
-      .select('sede,team,contratto,ambito,clienti');
-    if (error) return alert(error.message);
-
-    const count = (key) => {
-      const m = {};
-      data.forEach(r => {
-        const vals = Array.isArray(r[key]) ? r[key] : [r[key]];
-        vals.forEach(v => { if (v) m[v] = (m[v]||0)+1; });
-      });
-      return m;
-    };
-
-    renderPie('chartSede',     'AS per Sede',      count('sede'));
-    renderPie('chartTeam',     'AS per Team',      count('team'));
-    renderPie('chartContract', 'AS per Contratto', count('contratto'));
-    renderPie('chartAmbito',   'AS per Ambito',    count('ambito'));
-    renderPie('chartClients',  'AS per Clienti',   count('clienti'));
-  }
-
-  function renderPie(id, title, dataObj) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (chartMap[id]) chartMap[id].destroy();
-    const labels = Object.keys(dataObj);
-    const data   = Object.values(dataObj);
-    const colors = labels.map((_,i)=>`hsl(${i*360/labels.length},70%,60%)`);
-    chartMap[id] = new Chart(ctx, {
+  // disegna un chart
+  function renderChart(ctxId, key, title){
+    const mapping = conta(key);
+    new Chart(document.getElementById(ctxId).getContext('2d'), {
       type: 'pie',
-      data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { plugins:{ title:{ display:true,text:title }, legend:{ position:'bottom' } } }
+      data: {
+        labels: Object.keys(mapping),
+        datasets: [{
+          data: Object.values(mapping),
+          backgroundColor: Object.keys(mapping).map((_,i)=>`hsl(${i*60},70%,50%)`)
+        }]
+      },
+      options: {
+        plugins:{ title:{ display:true, text: title + ' (' + data.length + ' AS)' } }
+      }
     });
   }
-});
+
+  renderChart('chart-sede',      'sede',      'AS per Sede');
+  renderChart('chart-team',      'team',      'AS per Team');
+  renderChart('chart-contratto', 'contratto', 'AS per Contratto');
+  renderChart('chart-ambito',    'ambito',    'AS per Ambito');
+  renderChart('chart-clienti',   'clienti',   'AS per Clienti');
+}
