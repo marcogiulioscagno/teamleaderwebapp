@@ -1,64 +1,64 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Repository Dipendenti</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>REPOSITORY DIPENDENTI</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body>
-  <header>
-    <h1>REPOSITORY DIPENDENTI</h1>
-    <nav id="menu">
-      <button id="btn-statistiche">Statistiche</button>
-      <button id="btn-dipendenti">Dipendenti</button>
-    </nav>
-    <hr>
-  </header>
+  <h1>REPOSITORY DIPENDENTI</h1>
 
-  <main>
-    <!-- SEZIONE STATISTICHE -->
-    <section id="statistiche" class="active">
-      <h2>Statistiche</h2>
-      <div class="chart-container"><canvas id="chart-sede"></canvas></div>
-      <div class="chart-container"><canvas id="chart-team"></canvas></div>
-      <div class="chart-container"><canvas id="chart-contratto"></canvas></div>
-      <div class="chart-container"><canvas id="chart-ambito"></canvas></div>
-      <div class="chart-container"><canvas id="chart-clienti"></canvas></div>
-    </section>
+  <div class="nav">
+    <button id="btnStats">Statistiche</button>
+    <button id="btnList">Dipendenti</button>
+  </div>
+  <hr/>
 
-    <!-- SEZIONE DIPENDENTI -->
-    <section id="dipendenti">
-      <h2>Elenco Dipendenti</h2>
-      <form id="form-dip">
-        <input type="text" id="input-nome"      placeholder="Nome"       required>
-        <input type="text" id="input-cognome"   placeholder="Cognome"    required>
-        <input type="text" id="input-team"      placeholder="Team">
-        <input type="text" id="input-ruolo"     placeholder="Ruolo">
-        <input type="text" id="input-sede"      placeholder="Sede">
-        <input type="text" id="input-contratto" placeholder="Contratto">
-        <input type="text" id="input-ambito"    placeholder="Ambito (csv)">
-        <input type="text" id="input-clienti"   placeholder="Clienti (csv)">
-        <input type="text" id="input-stato"     placeholder="Stato">
-        <button type="submit">Aggiungi Dipendente</button>
-      </form>
-      <table id="tbl-dipendenti">
-        <thead>
-          <tr>
-            <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
-            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th><th>Stato</th><th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
+  <section id="statsSection">
+    <h2>Statistiche</h2>
+    <div class="chart-container"><canvas id="chartSede"></canvas></div>
+    <div class="chart-container"><canvas id="chartTeam"></canvas></div>
+    <div class="chart-container"><canvas id="chartContratto"></canvas></div>
+    <div class="chart-container"><canvas id="chartAmbito"></canvas></div>
+    <div class="chart-container"><canvas id="chartClienti"></canvas></div>
+  </section>
 
-  <!-- 1) Supabase UMD client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
-  <!-- 2) Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- 3) Il tuo codice -->
+  <section id="listSection" class="hidden">
+    <h2>Elenco Application Specialists</h2>
+
+    <form id="form-dip">
+      <div class="grid">
+        <input id="input-nome"       placeholder="Nome"       required />
+        <input id="input-cognome"    placeholder="Cognome"    required />
+        <input id="input-team"       placeholder="Team"       required />
+        <input id="input-ruolo"      placeholder="Ruolo"      required />
+        <input id="input-sede"       placeholder="Sede"       required />
+        <input id="input-contratto"  placeholder="Contratto"  required />
+        <input id="input-ambito"     placeholder="Ambito (csv)" />
+        <input id="input-clienti"    placeholder="Clienti (csv)" />
+        <input id="input-stato"      placeholder="Stato"      />
+      </div>
+      <button type="submit" id="btnAdd">Aggiungi AS</button>
+    </form>
+
+    <table id="tbl-dipendenti">
+      <thead>
+        <tr>
+          <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
+          <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th>
+          <th>Stato</th><th> </th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
   <script src="script.js"></script>
 </body>
 </html>
