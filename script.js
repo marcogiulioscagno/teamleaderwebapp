@@ -1,64 +1,52 @@
-// chiavi Supabase
+// 1) Inizializzo Supabase
 const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' ;
-const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// elementi
-const btnStat = document.querySelector('#btn-statistiche');
-const btnDip = document.querySelector('#btn-dipendenti');
-const secStat = document.querySelector('#statistiche');
-const secDip  = document.querySelector('#dipendenti');
+// 2) Elementi di navigazione
+const btnStat = document.getElementById('btn-statistiche');
+const btnDip  = document.getElementById('btn-dipendenti');
+const secStat = document.getElementById('statistiche');
+const secDip  = document.getElementById('dipendenti');
 
-btnStat.addEventListener('click', () => {
+btnStat.addEventListener('click', ()=> {
   secStat.classList.remove('hidden');
   secDip.classList.add('hidden');
   caricaStatistiche();
 });
-btnDip.addEventListener('click', () => {
+btnDip.addEventListener('click', ()=> {
   secDip .classList.remove('hidden');
   secStat.classList.add('hidden');
   caricaAS();
 });
 
-// Dati AS in memoria
+// 3) Gestione elenco AS
 let elencoAS = [];
-
-// FUNZIONE: aggiungi AS
-document.querySelector('#btn-aggiungi').addEventListener('click', async () => {
-  // leggi campi
-  const dati = {
-    nome:      document.querySelector('#input-nome').value,
-    cognome:   document.querySelector('#input-cognome').value,
-    team:      document.querySelector('#input-team').value,
-    ruolo:     document.querySelector('#input-ruolo').value,
-    sede:      document.querySelector('#input-sede').value,
-    contratto: document.querySelector('#input-contratto').value,
-    ambito:    document.querySelector('#input-ambito').value.split(','),
-    clienti:   document.querySelector('#input-clienti').value.split(','),
-    stato:     document.querySelector('#input-stato').value,
+document.getElementById('btn-aggiungi').onclick = async () => {
+  const d = {
+    nome:      document.getElementById('input-nome').value,
+    cognome:   document.getElementById('input-cognome').value,
+    team:      document.getElementById('input-team').value,
+    ruolo:     document.getElementById('input-ruolo').value,
+    sede:      document.getElementById('input-sede').value,
+    contratto: document.getElementById('input-contratto').value,
+    ambito:    document.getElementById('input-ambito').value.split(','),
+    clienti:   document.getElementById('input-clienti').value.split(','),
+    stato:     document.getElementById('input-stato').value,
   };
-  // salva via API
-  const { error } = await supabase
-    .from('application_specialists')
-    .insert([dati]);
-  if (error) return alert('Errore salvataggio');
-  // ricarica elenco
+  const { error } = await supabase.from('application_specialists').insert([d]);
+  if (error) return alert('Errore: ' + error.message);
   caricaAS();
-  // pulisci form
   document.querySelectorAll('.form-grid input').forEach(i=>i.value='');
-});
+};
 
-// FUNZIONE: carica elenco AS
 async function caricaAS() {
-  const { data, error } = await supabase
-    .from('application_specialists')
-    .select();
-  if (error) return alert('Errore caricamento');
+  const { data, error } = await supabase.from('application_specialists').select();
+  if (error) return alert('Errore: ' + error.message);
   elencoAS = data;
   renderTabella();
 }
 
-// FUNZIONE: render tabella
 function renderTabella() {
   const tbody = document.querySelector('#tabella-as tbody');
   tbody.innerHTML = '';
@@ -77,59 +65,49 @@ function renderTabella() {
       <td><button class="del" data-id="${as.id}">Elimina</button></td>`;
     tbody.appendChild(tr);
   });
-  document.querySelectorAll('.del').forEach(btn=>{
-    btn.onclick = async ()=> {
-      const id = btn.dataset.id;
-      await supabase.from('application_specialists').delete().eq('id', id);
+  document.querySelectorAll('.del').forEach(b=>{
+    b.onclick = async () => {
+      await supabase.from('application_specialists').delete().eq('id', b.dataset.id);
       caricaAS();
     };
   });
 }
 
-// FUNZIONE: statistiche
+// 4) Statistiche
 async function caricaStatistiche() {
-  // prendi dati
   await caricaAS();
-  // genera ciascun grafico
-  creaGrafico('chart-sede',      'AS per Sede',      raggruppa(elencoAS, 'sede'));
-  creaGrafico('chart-team',      'AS per Team',      raggruppa(elencoAS, 'team'));
-  creaGrafico('chart-contratto', 'AS per Contratto', raggruppa(elencoAS, 'contratto'));
-  creaGrafico('chart-ambito',    'AS per Ambito',    raggruppaMulti(elencoAS, 'ambito'));
-  creaGrafico('chart-clienti',   'AS per Clienti',   raggruppaMulti(elencoAS, 'clienti'));
+  creaGrafico('chart-sede',      'AS per Sede',      raggruppa(elencoAS,'sede'));
+  creaGrafico('chart-team',      'AS per Team',      raggruppa(elencoAS,'team'));
+  creaGrafico('chart-contratto', 'AS per Contratto', raggruppa(elencoAS,'contratto'));
+  creaGrafico('chart-ambito',    'AS per Ambito',    raggruppaMulti(elencoAS,'ambito'));
+  creaGrafico('chart-clienti',   'AS per Clienti',   raggruppaMulti(elencoAS,'clienti'));
 }
 
-// raggruppa campo singolo
 function raggruppa(arr, campo) {
-  return arr.reduce((acc, x) => {
-    const k = x[campo]||'';
-    acc[k] = (acc[k]||0)+1;
-    return acc;
-  }, {});
+  return arr.reduce((acc,x)=>{ acc[x[campo]]=(acc[x[campo]]||0)+1; return acc; }, {});
 }
-// raggruppa array di valori
 function raggruppaMulti(arr, campo) {
-  return arr.flatMap(x=>x[campo]).reduce((acc, v) => {
-    acc[v] = (acc[v]||0)+1;
-    return acc;
-  }, {});
+  return arr.flatMap(x=>x[campo]).reduce((acc,v)=>{ acc[v]=(acc[v]||0)+1; return acc; }, {});
 }
 
-// crea grafico a torta
-function creaGrafico(id, title, dataObj) {
+function creaGrafico(id,title,dataObj) {
   const ctx = document.getElementById(id).getContext('2d');
-  const labels = Object.keys(dataObj);
-  const data   = Object.values(dataObj);
-  // distruggi se già esiste
   if (ctx.chart) ctx.chart.destroy();
+  const labels = Object.keys(dataObj),
+        data   = Object.values(dataObj);
   ctx.chart = new Chart(ctx, {
-    type: 'pie',
-    data: { labels, datasets: [{ data, backgroundColor: ['#e74c3c','#f1c40f','#2ecc71','#3498db','#9b59b6'] }] },
-    options: {
-      plugins: { legend:{ position:'top' }, title:{ display:true, text:`${title} (${data.reduce((a,b)=>a+b,0)} AS)` }},
-      responsive:true, maintainAspectRatio:false
+    type:'pie',
+    data:{ labels, datasets:[{ data, backgroundColor:['#e74c3c','#f1c40f','#2ecc71','#3498db','#9b59b6'] }]},
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        title:{ display:true, text:`${title} (${data.reduce((a,b)=>a+b,0)} AS)` },
+        legend:{ position:'top' }
+      }
     }
   });
 }
 
-// avvio iniziale
+// 5) Avvio su STATISTICHE
 btnStat.click();
