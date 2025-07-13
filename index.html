@@ -1,65 +1,70 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gestionale Team Leader</title>
-  <link href="style.css" rel="stylesheet" type="text/css">
-  <!-- Chart.js -->
+  <link href="style.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
   <header>
     <h1>GESTIONALE TEAM LEADER</h1>
     <nav>
-      <button id="btn-dipendenti">Dipendenti</button>
       <button id="btn-statistiche">Statistiche</button>
+      <button id="btn-dipendenti">Dipendenti</button>
     </nav>
   </header>
 
   <main>
-    <section id="sez-dipendenti" class="hidden">
-      <!-- form e tabella come prima -->
-      <h2>Elenco Application Specialists</h2>
-      <div class="form-row">
-        <input id="nome"       placeholder="Nome">
-        <input id="cognome"    placeholder="Cognome">
-        <input id="team"       placeholder="Team">
-        <input id="ruolo"      placeholder="Ruolo">
-        <input id="sede"       placeholder="Sede">
-        <input id="contratto"  placeholder="Contratto">
-        <input id="ambito"     placeholder="Ambito (csv)">
-        <input id="clienti"    placeholder="Clienti (csv)">
-        <input id="stato"      placeholder="Stato">
-      </div>
-      <button id="btn-add">Aggiungi AS</button>
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th><th>Cognome</th><th>Team</th>
-            <th>Ruolo</th><th>Sede</th><th>Contratto</th>
-            <th>Ambito</th><th>Clienti</th><th>Stato</th><th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody id="tbl-body"></tbody>
-      </table>
-    </section>
-
-    <section id="sez-statistiche">
+    <!-- Statistiche -->
+    <section id="statistiche" class="hidden">
       <h2>Statistiche</h2>
-      <div class="charts">
+      <div class="chart-container">
         <canvas id="chart-sede"></canvas>
+      </div>
+      <div class="chart-container">
         <canvas id="chart-team"></canvas>
+      </div>
+      <div class="chart-container">
         <canvas id="chart-contratto"></canvas>
+      </div>
+      <div class="chart-container">
         <canvas id="chart-ambito"></canvas>
+      </div>
+      <div class="chart-container">
         <canvas id="chart-clienti"></canvas>
       </div>
     </section>
+
+    <!-- Elenco AS -->
+    <section id="dipendenti" class="hidden">
+      <h2>Elenco Application Specialists</h2>
+      <div class="form-grid">
+        <input id="input-nome"     placeholder="Nome" />
+        <input id="input-cognome"  placeholder="Cognome" />
+        <input id="input-team"     placeholder="Team" />
+        <input id="input-ruolo"    placeholder="Ruolo" />
+        <input id="input-sede"     placeholder="Sede" />
+        <input id="input-contratto"placeholder="Contratto" />
+        <input id="input-ambito"   placeholder="Ambito (csv)" />
+        <input id="input-clienti"  placeholder="Clienti (csv)" />
+        <input id="input-stato"    placeholder="Stato" />
+      </div>
+      <button id="btn-aggiungi">Aggiungi AS</button>
+      <table id="tabella-as">
+        <thead>
+          <tr>
+            <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
+            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th><th>Stato</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
   </main>
 
-  <!-- il tuo script.js va per ultimo -->
   <script src="script.js"></script>
 </body>
 </html>
