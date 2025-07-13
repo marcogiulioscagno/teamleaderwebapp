@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Gestionale Team Leader</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Supabase client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Chart.js per i grafici -->
+  <!-- Supabase UMD build -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  <!-- Chart.js UMD build -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -24,24 +24,22 @@
   </header>
 
   <main>
-    <!-- HOME -->
     <section id="home" class="section">
       <p>Benvenuto nel gestionale Team Leader. Usa il menu per navigare.</p>
     </section>
 
-    <!-- ELENCO AS -->
     <section id="list" class="section hidden">
       <h2>Elenco Application Specialists</h2>
       <form id="as-form">
-        <input type="text" id="nome"     placeholder="Nome"     required />
-        <input type="text" id="cognome"  placeholder="Cognome"  required />
-        <input type="text" id="team"     placeholder="Team"     required />
-        <input type="text" id="ruolo"    placeholder="Ruolo"    required />
-        <input type="text" id="sede"     placeholder="Sede"     required />
-        <input type="text" id="contratto"placeholder="Contratto"required />
-        <input type="text" id="ambito"   placeholder="Ambito (csv)"   />
-        <input type="text" id="clienti"  placeholder="Clienti (csv)"  />
-        <input type="text" id="stato"    placeholder="Stato"    />
+        <input type="text" id="nome"      placeholder="Nome"      required />
+        <input type="text" id="cognome"   placeholder="Cognome"   required />
+        <input type="text" id="team"      placeholder="Team"      required />
+        <input type="text" id="ruolo"     placeholder="Ruolo"     required />
+        <input type="text" id="sede"      placeholder="Sede"      required />
+        <input type="text" id="contratto" placeholder="Contratto" required />
+        <input type="text" id="ambito"    placeholder="Ambito (csv)" />
+        <input type="text" id="clienti"   placeholder="Clienti (csv)" />
+        <input type="text" id="stato"     placeholder="Stato"     />
         <button type="submit">Aggiungi AS</button>
       </form>
       <table id="as-table">
@@ -55,7 +53,6 @@
       </table>
     </section>
 
-    <!-- STATISTICHE -->
     <section id="stats" class="section hidden">
       <h2>Statistiche AS</h2>
       <div class="chart-grid">
@@ -67,7 +64,6 @@
       </div>
     </section>
 
-    <!-- Placeholder per le altre sezioni -->
     <section id="reperibilita" class="section hidden">
       <h2>Reperibilità</h2>
       <p>In costruzione…</p>
