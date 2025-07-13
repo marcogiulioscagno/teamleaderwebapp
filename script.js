@@ -1,120 +1,126 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // === CONFIGURAZIONE SUPABASE ===
-  const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
-  const sb = supabase.createClient(supabaseUrl, supabaseKey);
+// ——— CONFIG SUPABASE ———
+const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
 
-  // === SELEZIONE SEZIONI ===
-  const homeSec  = document.getElementById('homeSection');
-  const listSec  = document.getElementById('listSection');
-  const statsSec = document.getElementById('statsSection');
+// ——— ELEMENTI DOM ———
+const btnStats = document.getElementById('btnStats');
+const btnEmployees = document.getElementById('btnEmployees');
+const secStats = document.getElementById('sectionStats');
+const secEmp   = document.getElementById('sectionEmployees');
+const tblBody  = document.querySelector('#tableEmployees tbody');
+const formAdd  = document.getElementById('formAdd');
 
-  // === NAV ===
-  document.getElementById('btnList').onclick  = () => { show(listSec); loadList(); };
-  document.getElementById('btnStats').onclick = () => { show(statsSec); loadStats(); };
-
-  function show(sec) {
-    [homeSec, listSec, statsSec].forEach(s => s.classList.add('hidden'));
-    sec.classList.remove('hidden');
-  }
-  // di default mostriamo subito STATISTICHE
-  show(statsSec);
-
-  // === DIPENDENTI ===
-  const inName     = document.getElementById('inName');
-  const inSurname  = document.getElementById('inSurname');
-  const inTeam     = document.getElementById('inTeam');
-  const inRole     = document.getElementById('inRole');
-  const inSede     = document.getElementById('inSede');
-  const inContract = document.getElementById('inContract');
-  const inAmbito   = document.getElementById('inAmbito');
-  const inClients  = document.getElementById('inClients');
-  const inState    = document.getElementById('inState');
-  const listBody   = document.getElementById('listBody');
-  document.getElementById('btnAdd').onclick = addAS;
-
-  async function loadList() {
-    listBody.innerHTML = '';
-    const { data, error } = await sb
-      .from('application_specialists')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (error) return alert(error.message);
-    data.forEach(r => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${r.nome}</td><td>${r.cognome}</td><td>${r.team}</td><td>${r.ruolo}</td>
-        <td>${r.sede}</td><td>${r.contratto}</td>
-        <td>${Array.isArray(r.ambito)? r.ambito.join(', '): r.ambito}</td>
-        <td>${Array.isArray(r.clienti)? r.clienti.join(', '): r.clienti}</td>
-        <td>${r.stato}</td>
-        <td><button data-id="${r.id}">X</button></td>
-      `;
-      tr.querySelector('button').onclick = () => deleteAS(r.id);
-      listBody.appendChild(tr);
-    });
-  }
-
-  async function addAS() {
-    const nuovo = {
-      nome:       inName.value.trim(),
-      cognome:    inSurname.value.trim(),
-      team:       inTeam.value.trim(),
-      ruolo:      inRole.value.trim(),
-      sede:       inSede.value.trim(),
-      contratto:  inContract.value.trim(),
-      ambito:     inAmbito.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
-      clienti:    inClients.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
-      stato:      inState.value.trim()
-    };
-    const { error } = await sb.from('application_specialists').insert(nuovo);
-    if (error) return alert(error.message);
-    [inName,inSurname,inTeam,inRole,inSede,inContract,inAmbito,inClients,inState]
-      .forEach(i=>i.value='');
-    loadList();
-  }
-
-  async function deleteAS(id) {
-    if (!confirm('Eliminare questo AS?')) return;
-    const { error } = await sb.from('application_specialists').delete().eq('id', id);
-    if (error) return alert(error.message);
-    loadList();
-  }
-
-  // === STATISTICHE ===
-  const chartMap = {};
-  async function loadStats() {
-    const { data, error } = await sb
-      .from('application_specialists')
-      .select('sede,team,contratto,ambito,clienti');
-    if (error) return alert(error.message);
-
-    const count = (key) => {
-      const m = {};
-      data.forEach(r => {
-        const vals = Array.isArray(r[key]) ? r[key] : [r[key]];
-        vals.forEach(v => { if (v) m[v] = (m[v]||0)+1; });
-      });
-      return m;
-    };
-
-    renderPie('chartSede',     'AS per Sede',      count('sede'));
-    renderPie('chartTeam',     'AS per Team',      count('team'));
-    renderPie('chartContract', 'AS per Contratto', count('contratto'));
-    renderPie('chartAmbito',   'AS per Ambito',    count('ambito'));
-    renderPie('chartClients',  'AS per Clienti',   count('clienti'));
-  }
-
-  function renderPie(id, title, dataObj) {
-    const ctx = document.getElementById(id).getContext('2d');
-    if (chartMap[id]) chartMap[id].destroy();
-    const labels = Object.keys(dataObj);
-    const data   = Object.values(dataObj);
-    const colors = labels.map((_,i)=>`hsl(${i*360/labels.length},70%,60%)`);
-    chartMap[id] = new Chart(ctx, {
-      type: 'pie',
-      data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { plugins:{ title:{ display:true,text:title }, legend:{ position:'bottom' } } }
-    });
-  }
+// ——— INIT ———
+window.addEventListener('DOMContentLoaded', () => {
+  // navigazione
+  btnStats.addEventListener('click', () => showSection('stats'));
+  btnEmployees.addEventListener('click', () => showSection('employees'));
+  // form
+  formAdd.addEventListener('submit', onAddEmployee);
+  // apri di default Statistiche
+  showSection('stats');
 });
+
+// mostra/nasconde sezioni
+function showSection(name) {
+  btnStats.classList.toggle('active', name==='stats');
+  btnEmployees.classList.toggle('active', name==='employees');
+  secStats.classList.toggle('active', name==='stats');
+  secEmp.classList.toggle('active', name==='employees');
+  if (name==='stats') loadStats();
+  else loadEmployees();
+}
+
+// ——— DIPENDENTI ———
+async function loadEmployees() {
+  const { data, error } = await supabase
+    .from('application_specialists')
+    .select('*');
+  if (error) return alert('Errore caricamento dipendenti.');
+  tblBody.innerHTML = '';
+  data.forEach(emp => {
+    const tr = document.createElement('tr');
+    ['nome','cognome','team','ruolo','sede','contratto','ambito','clienti','stato']
+      .forEach(f => tr.innerHTML += `<td>${emp[f]||''}</td>`);
+    const btn = document.createElement('button');
+    btn.textContent = '❌';
+    btn.classList.add('delete');
+    btn.onclick = () => deleteEmployee(emp.id);
+    tr.appendChild(btn);
+    tblBody.appendChild(tr);
+  });
+}
+
+async function onAddEmployee(evt) {
+  evt.preventDefault();
+  const vals = ['Nome','Cognome','Team','Ruolo','Sede','Contratto','Ambito','Clienti','Stato']
+    .map((_,i)=>
+      document.getElementById([
+        'inpNome','inpCognome','inpTeam','inpRuolo',
+        'inpSede','inpContratto','inpAmbito','inpClienti','inpStato'
+      ][i]).value.trim()
+    );
+  const [nome,cognome,team,ruolo,sede,contratto,ambito,clienti,stato] = vals;
+  const { error } = await supabase
+    .from('application_specialists')
+    .insert([{ nome,cognome,team,ruolo,sede,contratto,ambito,clienti,stato }]);
+  if (error) return alert('Errore inserimento.');
+  formAdd.reset();
+  loadEmployees();
+}
+
+async function deleteEmployee(id) {
+  await supabase.from('application_specialists').delete().eq('id', id);
+  loadEmployees();
+}
+
+// ——— STATISTICHE ———
+async function loadStats() {
+  const { data, error } = await supabase
+    .from('application_specialists')
+    .select('sede,team,contratto,ambito,clienti');
+  if (error) return alert('Errore statistiche.');
+  // helper per raggruppare
+  const group = (arr, prop) => {
+    const m = {};
+    arr.forEach(o => {
+      let vals = o[prop] || '';
+      if (prop==='ambito' || prop==='clienti') vals = vals.split(',').map(s=>s.trim());
+      if (!Array.isArray(vals)) vals = [vals];
+      vals.forEach(v => {
+        if (!v) return;
+        m[v] = (m[v]||0) + 1;
+      });
+    });
+    return m;
+  };
+  // crea grafico
+  function makeChart(id,title,map,colors) {
+    const ctx = document.getElementById(id).getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(map),
+        datasets: [{ data: Object.values(map), backgroundColor: colors }]
+      },
+      options: {
+        plugins:{ title:{ display:true, text:`${title} (${Object.values(map).reduce((a,b)=>a+b,0)} AS)` } }
+      }
+    });
+  }
+  // mappe
+  const mSede      = group(data,'sede');
+  const mTeam      = group(data,'team');
+  const mContratto = group(data,'contratto');
+  const mAmbito    = group(data,'ambito');
+  const mClienti   = group(data,'clienti');
+  // palette base
+  const palette = ['#e74c3c','#f1c40f','#2ecc71','#3498db','#9b59b6','#e67e22'];
+  // disegna
+  makeChart('chartSede','AS per Sede',mSede,palette);
+  makeChart('chartTeam','AS per Team',mTeam,palette);
+  makeChart('chartContratto','AS per Contratto',mContratto,palette);
+  makeChart('chartAmbito','AS per Ambito',mAmbito,palette);
+  makeChart('chartClienti','AS per Clienti',mClienti,palette);
+}
