@@ -1,94 +1,84 @@
 * { box-sizing: border-box; margin:0; padding:0; }
-
 body {
   font-family: sans-serif;
   background: #111;
   color: #fff;
 }
-
 header {
   text-align: center;
-  padding: 24px 0;
+  padding: 16px 0;
 }
-
 nav {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
-
 nav button {
-  padding: 8px 16px;
   background: #0077cc;
-  border: none;
-  border-radius: 4px;
   color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
   cursor: pointer;
 }
-
 nav button:hover {
   background: #005fa3;
 }
-
 main {
   max-width: 900px;
   margin: auto;
   padding: 16px;
 }
-
 .hidden {
   display: none;
 }
-
 section h2 {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
-
+hr {
+  border: none;
+  border-bottom: 1px solid #444;
+  margin: 8px 0;
+}
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px,1fr));
+  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
   gap: 8px;
   margin-bottom: 12px;
 }
-
 .form-grid input {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #555;
   background: #222;
   color: #fff;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 8px;
 }
-
 #btn-aggiungi {
-  display: block;
   width: 100%;
-  padding: 10px;
   background: #0077cc;
   color: #fff;
+  padding: 10px;
   border: none;
   border-radius: 4px;
-  margin-bottom: 16px;
   cursor: pointer;
+  margin-bottom: 16px;
 }
-
 #tabella-as {
   width: 100%;
   border-collapse: collapse;
 }
-
 #tabella-as th, #tabella-as td {
-  padding: 8px;
   border: 1px solid #333;
+  padding: 8px;
 }
-
 #tabella-as tbody tr:nth-child(even) {
   background: #222;
 }
-
 .chart-container {
   background: #222;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
+  height: 300px;
 }
