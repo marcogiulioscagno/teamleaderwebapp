@@ -1,121 +1,146 @@
-// → Sostituisci con i tuoi valori esatti:
-const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
-const sb = supabase.createClient(supabaseUrl, supabaseKey);
+//1) inizializza Supabase
+const SUPABASE_URL     = 'https://fzbpucvscnfyimefrvzs.supabase.co';
+const SUPABASE_ANON_KEY= 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// palette colori fissa
-const COLORS = ['#3366cc','#dc3912','#ff9900','#109618','#990099','#0099c6','#dd4477','#66aa00','#b82e2e','#316395'];
-
-// ——— NAVIGAZIONE ———
-document.querySelectorAll('button[data-sec]').forEach(btn => {
+// 2) NAVIGAZIONE tra le sezioni
+document.querySelectorAll('nav button').forEach(btn => {
   btn.addEventListener('click', () => {
-    // nascondi tutte le sezioni
-    document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
-    // mostra quella cliccata
-    const sec = document.getElementById('sezione-' + btn.dataset.sec);
-    sec.classList.add('active');
-    // se era Statistiche, ricalcola
-    if (btn.dataset.sec === 'statistiche') renderStats();
+    // attiva il button
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // mostra la sezione corretta
+    document.querySelectorAll('main section').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(btn.dataset.sec).classList.add('active');
+    // carica dati se serve
+    if (btn.dataset.sec === 'elenco') caricaElenco();
+    if (btn.dataset.sec === 'statistiche') caricaStatistiche();
   });
 });
 
-// ——— ELENCO AS ———
-const form = document.getElementById('as-form');
-const tbody = document.querySelector('#as-table tbody');
+// di default apri HOME
+document.querySelector('nav button[data-sec="home"]').click();
 
-form.addEventListener('submit', async e => {
-  e.preventDefault();
-  const f = e.target;
-  const rec = {
-    nome:      f.nome.value,
-    cognome:   f.cognome.value,
-    team:      f.team.value,
-    ruolo:     f.ruolo.value,
-    sede:      f.sede.value,
-    contratto: f.contratto.value,
-    ambito:    f.ambito.value.split(',').map(s=>s.trim()).filter(Boolean),
-    clienti:   f.clienti.value.split(',').map(s=>s.trim()).filter(Boolean),
-    stato:     f.stato.value
+
+// 3) gestione ELENCO AS
+const tblBody = document.getElementById('tblBody');
+document.getElementById('btnAdd').addEventListener('click', async () => {
+  const nuovo = {
+    nome:      document.getElementById('fNome').value.trim(),
+    cognome:   document.getElementById('fCognome').value.trim(),
+    team:      document.getElementById('fTeam').value.trim(),
+    ruolo:     document.getElementById('fRuolo').value.trim(),
+    sede:      document.getElementById('fSede').value.trim(),
+    contratto: document.getElementById('fContratto').value.trim(),
+    ambito:    document.getElementById('fAmbito').value.trim(),
+    clienti:   document.getElementById('fClienti').value.trim(),
+    stato:     document.getElementById('fStato').value.trim(),
   };
-  const { error } = await sb.from('application_specialists').insert([ rec ]);
-  if (error) return alert('Errore inserimento: ' + error.message);
-  f.reset();
-  loadTable();
+  // inserisci nel DB
+  const { error } = await sb
+    .from('application_specialists')
+    .insert([nuovo]);
+  if (error) return alert('Errore inserimento: '+ error.message);
+  // ripulisci form e ricarica
+  document.querySelectorAll('.form-row input').forEach(i=>i.value='');
+  caricaElenco();
 });
 
-async function loadTable() {
+async function caricaElenco() {
+  tblBody.innerHTML = '<tr><td colspan="10">Caricamento…</td></tr>';
   const { data, error } = await sb
     .from('application_specialists')
     .select('*')
-    .order('created_at',{ ascending: false });
-  if (error) return console.error(error);
-  tbody.innerHTML = data.map(r=>`
-    <tr>
-      <td>${r.nome}</td>
-      <td>${r.cognome}</td>
-      <td>${r.team||''}</td>
-      <td>${r.ruolo||''}</td>
-      <td>${r.sede||''}</td>
-      <td>${r.contratto||''}</td>
-      <td>${Array.isArray(r.ambito)?r.ambito.join(', '):''}</td>
-      <td>${Array.isArray(r.clienti)?r.clienti.join(', '):''}</td>
-      <td>${r.stato||''}</td>
-      <td><button data-id="${r.id}" class="delete-btn">Elimina</button></td>
-    </tr>`).join('');
-  document.querySelectorAll('.delete-btn').forEach(btn=>{
-    btn.onclick = async ()=>{
-      if (!confirm('Confermi eliminazione?')) return;
-      const { error } = await sb.from('application_specialists')
-        .delete().eq('id',btn.dataset.id);
-      if (error) return alert('Errore cancellazione: '+error.message);
-      loadTable();
-    };
+    .order('created_at', { ascending: false });
+  if (error) {
+    tblBody.innerHTML = `<tr><td colspan="10">Errore: ${error.message}</td></tr>`;
+    return;
+  }
+  if (!data.length) {
+    tblBody.innerHTML = '<tr><td colspan="10">Nessun record</td></tr>';
+    return;
+  }
+  tblBody.innerHTML = '';
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.nome}</td>
+      <td>${row.cognome}</td>
+      <td>${row.team}</td>
+      <td>${row.ruolo}</td>
+      <td>${row.sede}</td>
+      <td>${row.contratto}</td>
+      <td>${row.ambito}</td>
+      <td>${row.clienti}</td>
+      <td>${row.stato}</td>
+      <td><button data-id="${row.id}" class="del">❌</button></td>
+    `;
+    tblBody.appendChild(tr);
+    tr.querySelector('.del').addEventListener('click', async e => {
+      const id = e.currentTarget.dataset.id;
+      await sb.from('application_specialists').delete().eq('id', id);
+      caricaElenco();
+    });
   });
 }
-window.addEventListener('DOMContentLoaded', loadTable);
 
-// ——— STATISTICHE ———
-async function renderStats() {
-  const { data, error } = await sb
-    .from('application_specialists')
-    .select('*');
-  if (error) return console.error(error);
 
-  const countBy = (arr, fn) =>
-    arr.reduce((acc,x)=>{
-      const k = fn(x) || '—';
-      acc[k] = (acc[k]||0)+1;
+// 4) gestione STATISTICHE
+async function caricaStatistiche() {
+  // scarica tutti i record
+  const { data, error } = await sb.from('application_specialists').select('*');
+  if (error) return alert('Errore statistiche: '+ error.message);
+
+  // helper: conta per campo
+  const conta = (arr, campo) => {
+    return arr.reduce((acc, r) => {
+      const val = r[campo] || '—';
+      acc[val] = (acc[val] || 0) + 1;
       return acc;
-    },{});
-
-  const stats = {
-    contratto: countBy(data, r=>r.contratto),
-    sede:       countBy(data, r=>r.sede),
-    team:       countBy(data, r=>r.team),
-    ambito:     countBy(data, r=>Array.isArray(r.ambito)?r.ambito.join(', '):r.ambito),
-    clienti:    countBy(data, r=>Array.isArray(r.clienti)?r.clienti.join(', '):r.clienti)
+    }, {});
   };
 
-  createPie('chart-contratto','AS per Contratto', stats.contratto);
-  createPie('chart-sede','AS per Sede', stats.sede);
-  createPie('chart-team','AS per Team', stats.team);
-  createPie('chart-ambito','AS per Ambito', stats.ambito);
-  createPie('chart-clienti','AS per Clienti', stats.clienti);
+  // prepara i dataset
+  const dsSede      = conta(data, 'sede');
+  const dsTeam      = conta(data, 'team');
+  const dsContratto = conta(data, 'contratto');
+  const dsAmbito    = conta(data, 'ambito');
+  const dsClienti   = conta(data, 'clienti');
+
+  // disegna i 5 grafici (Chart.js)
+  if (typeof Chart === 'undefined') {
+    // carica Chart.js on-the-fly
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+    document.head.appendChild(s);
+    s.onload = () => creaChart('chartSede',      dsSede,      'AS per Sede');
+    s.onload = () => creaChart('chartTeam',      dsTeam,      'AS per Team');
+    s.onload = () => creaChart('chartContratto', dsContratto, 'AS per Contratto');
+    s.onload = () => creaChart('chartAmbito',    dsAmbito,    'AS per Ambito');
+    s.onload = () => creaChart('chartClienti',   dsClienti,   'AS per Clienti');
+  } else {
+    creaChart('chartSede',      dsSede,      'AS per Sede');
+    creaChart('chartTeam',      dsTeam,      'AS per Team');
+    creaChart('chartContratto', dsContratto, 'AS per Contratto');
+    creaChart('chartAmbito',    dsAmbito,    'AS per Ambito');
+    creaChart('chartClienti',   dsClienti,   'AS per Clienti');
+  }
 }
 
-function createPie(canvasId, title, counts) {
+function creaChart(canvasId, dataObj, label) {
   const ctx = document.getElementById(canvasId).getContext('2d');
-  const labels = Object.keys(counts);
-  const values = Object.values(counts);
-  const bg = labels.map((_,i)=>COLORS[i % COLORS.length]);
-  if (ctx.chart) ctx.chart.destroy();
-  ctx.chart = new Chart(ctx, {
+  const labels = Object.keys(dataObj);
+  const values = Object.values(dataObj);
+  const colors = labels.map(_=>`hsl(${Math.random()*360},70%,60%)`);
+  new Chart(ctx, {
     type: 'pie',
-    data: { labels, datasets:[{ data: values, backgroundColor: bg }] },
+    data: { labels, datasets: [{ data: values, backgroundColor: colors }] },
     options: {
-      plugins:{
-        legend:{ position:'bottom' },
-        title:{ display:true, text:title }
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#fff' } },
+        title: { display: true, text: `${label} (totale: ${values.reduce((a,b)=>a+b,0)})`, color: '#fff' }
       }
     }
   });
