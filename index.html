@@ -5,47 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Repository Dipendenti</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Supabase JS client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
     <h1>REPOSITORY DIPENDENTI</h1>
-    <nav>
-      <button id="btnStats" class="nav-button">Statistiche</button>
-      <button id="btnEmployees" class="nav-button">Dipendenti</button>
+    <nav id="menu">
+      <button id="btn-statistiche">Statistiche</button>
+      <button id="btn-dipendenti">Dipendenti</button>
     </nav>
+    <hr>
   </header>
+
   <main>
-    <!-- Sezione Statistiche -->
-    <section id="sectionStats">
+    <!-- SEZIONE STATISTICHE -->
+    <section id="statistiche" class="active">
       <h2>Statistiche</h2>
-      <div id="charts">
-        <div class="chart-card"><canvas id="chartSede"></canvas></div>
-        <div class="chart-card"><canvas id="chartTeam"></canvas></div>
-        <div class="chart-card"><canvas id="chartContratto"></canvas></div>
-        <div class="chart-card"><canvas id="chartAmbito"></canvas></div>
-        <div class="chart-card"><canvas id="chartClienti"></canvas></div>
-      </div>
+      <div class="chart-container"><canvas id="chart-sede"></canvas></div>
+      <div class="chart-container"><canvas id="chart-team"></canvas></div>
+      <div class="chart-container"><canvas id="chart-contratto"></canvas></div>
+      <div class="chart-container"><canvas id="chart-ambito"></canvas></div>
+      <div class="chart-container"><canvas id="chart-clienti"></canvas></div>
     </section>
-    <!-- Sezione Dipendenti -->
-    <section id="sectionEmployees">
+
+    <!-- SEZIONE DIPENDENTI -->
+    <section id="dipendenti">
       <h2>Elenco Dipendenti</h2>
-      <form id="formAdd">
-        <input placeholder="Nome" id="inpNome" required>
-        <input placeholder="Cognome" id="inpCognome" required>
-        <input placeholder="Team" id="inpTeam" required>
-        <input placeholder="Ruolo" id="inpRuolo" required>
-        <input placeholder="Sede" id="inpSede" required>
-        <input placeholder="Contratto" id="inpContratto" required>
-        <input placeholder="Ambito (csv)" id="inpAmbito">
-        <input placeholder="Clienti (csv)" id="inpClienti">
-        <input placeholder="Stato" id="inpStato">
-        <button type="submit">Aggiungi</button>
+      <form id="form-dip">
+        <input type="text" id="input-nome"      placeholder="Nome"       required>
+        <input type="text" id="input-cognome"   placeholder="Cognome"    required>
+        <input type="text" id="input-team"      placeholder="Team">
+        <input type="text" id="input-ruolo"     placeholder="Ruolo">
+        <input type="text" id="input-sede"      placeholder="Sede">
+        <input type="text" id="input-contratto" placeholder="Contratto">
+        <input type="text" id="input-ambito"    placeholder="Ambito (csv)">
+        <input type="text" id="input-clienti"   placeholder="Clienti (csv)">
+        <input type="text" id="input-stato"     placeholder="Stato">
+        <button type="submit">Aggiungi Dipendente</button>
       </form>
-      <table id="tableEmployees">
+      <table id="tbl-dipendenti">
         <thead>
           <tr>
             <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
@@ -56,6 +53,12 @@
       </table>
     </section>
   </main>
+
+  <!-- 1) Supabase UMD client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  <!-- 2) Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- 3) Il tuo codice -->
   <script src="script.js"></script>
 </body>
 </html>
