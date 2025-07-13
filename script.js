@@ -10,15 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const statsSec = document.getElementById('statsSection');
 
   // === NAV ===
-  document.getElementById('btnList').onclick  = () => { show(listSec); loadList(); };
   document.getElementById('btnStats').onclick = () => { show(statsSec); loadStats(); };
+  document.getElementById('btnList').onclick  = () => { show(listSec);  loadList();  };
 
   function show(sec) {
     [homeSec, listSec, statsSec].forEach(s => s.classList.add('hidden'));
     sec.classList.remove('hidden');
   }
-  // di default mostriamo subito STATISTICHE
+
+  // di default mostriamo subito STATISTICHE e carichiamo i grafici
   show(statsSec);
+  loadStats();
 
   // === DIPENDENTI ===
   const inName     = document.getElementById('inName');
@@ -45,8 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
       tr.innerHTML = `
         <td>${r.nome}</td><td>${r.cognome}</td><td>${r.team}</td><td>${r.ruolo}</td>
         <td>${r.sede}</td><td>${r.contratto}</td>
-        <td>${Array.isArray(r.ambito)? r.ambito.join(', '): r.ambito}</td>
-        <td>${Array.isArray(r.clienti)? r.clienti.join(', '): r.clienti}</td>
+        <td>${Array.isArray(r.ambito) ? r.ambito.join(', ') : r.ambito}</td>
+        <td>${Array.isArray(r.clienti) ? r.clienti.join(', ') : r.clienti}</td>
         <td>${r.stato}</td>
         <td><button data-id="${r.id}">X</button></td>
       `;
@@ -65,12 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
       contratto:  inContract.value.trim(),
       ambito:     inAmbito.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
       clienti:    inClients.value.trim().split(',').map(s=>s.trim()).filter(s=>s),
-      stato:      inState.value.trim()
+      stato:      inState.value.trim(),
     };
     const { error } = await sb.from('application_specialists').insert(nuovo);
     if (error) return alert(error.message);
     [inName,inSurname,inTeam,inRole,inSede,inContract,inAmbito,inClients,inState]
-      .forEach(i=>i.value='');
+      .forEach(i => i.value = '');
     loadList();
   }
 
@@ -93,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const m = {};
       data.forEach(r => {
         const vals = Array.isArray(r[key]) ? r[key] : [r[key]];
-        vals.forEach(v => { if (v) m[v] = (m[v]||0)+1; });
+        vals.forEach(v => { if (v) m[v] = (m[v]||0) + 1; });
       });
       return m;
     };
@@ -110,11 +112,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chartMap[id]) chartMap[id].destroy();
     const labels = Object.keys(dataObj);
     const data   = Object.values(dataObj);
-    const colors = labels.map((_,i)=>`hsl(${i*360/labels.length},70%,60%)`);
+    const colors = labels.map((_,i) => `hsl(${i*360/labels.length},70%,60%)`);
     chartMap[id] = new Chart(ctx, {
       type: 'pie',
       data: { labels, datasets: [{ data, backgroundColor: colors }] },
-      options: { plugins:{ title:{ display:true,text:title }, legend:{ position:'bottom' } } }
+      options: {
+        plugins: {
+          title:  { display: true, text: title },
+          legend: { position: 'bottom' }
+        }
+      }
     });
   }
 });
