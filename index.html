@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gestionale Team Leader</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>GESTIONALE TEAM LEADER</h1>
+    <nav>
+      <button data-sec="elenco" class="active">ELENCO AS</button>
+      <button data-sec="statistiche">STATISTICHE</button>
+      <button data-sec="reperibilita">REPERIBILITÀ</button>
+      <button data-sec="straordinari">STRAORDINARI</button>
+      <button data-sec="indennita">INDENNITÀ</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ELENCO AS -->
+    <section id="sezione-elenco" class="sec active">
+      <h2>Elenco Application Specialists</h2>
+      <form id="as-form">
+        <input name="nome"      placeholder="Nome"       required>
+        <input name="cognome"   placeholder="Cognome"    required>
+        <input name="team"      placeholder="Team">
+        <input name="ruolo"     placeholder="Ruolo">
+        <input name="sede"      placeholder="Sede">
+        <input name="contratto" placeholder="Contratto">
+        <input name="ambito"    placeholder="Ambito (csv)">
+        <input name="clienti"   placeholder="Clienti (csv)">
+        <input name="stato"     placeholder="Stato">
+        <button type="submit">Aggiungi AS</button>
+      </form>
+      <table id="as-table">
+        <thead>
+          <tr>
+            <th>Nome</th><th>Cognome</th><th>Team</th><th>Ruolo</th>
+            <th>Sede</th><th>Contratto</th><th>Ambito</th><th>Clienti</th>
+            <th>Stato</th><th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- STATISTICHE -->
+    <section id="sezione-statistiche" class="sec">
+      <h2>Statistiche</h2>
+      <div id="chart-container">
+        <div class="chart-block">
+          <canvas id="chart-contratto"></canvas>
+          <p>AS per Contratto</p>
+        </div>
+        <div class="chart-block">
+          <canvas id="chart-sede"></canvas>
+          <p>AS per Sede</p>
+        </div>
+        <div class="chart-block">
+          <canvas id="chart-team"></canvas>
+          <p>AS per Team</p>
+        </div>
+        <div class="chart-block">
+          <canvas id="chart-ambito"></canvas>
+          <p>AS per Ambito</p>
+        </div>
+        <div class="chart-block">
+          <canvas id="chart-clienti"></canvas>
+          <p>AS per Clienti</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLACEHOLDER ALTRE SEZIONI -->
+    <section id="sezione-reperibilita" class="sec"><h2>Reperibilità</h2><p>Prossimamente…</p></section>
+    <section id="sezione-straordinari" class="sec"><h2>Straordinari</h2><p>Prossimamente…</p></section>
+    <section id="sezione-indennita" class="sec"><h2>Indennità</h2><p>Prossimamente…</p></section>
+  </main>
+
+  <!-- Librerie -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- Il nostro script -->
+  <script src="script.js"></script>
+</body>
+</html>

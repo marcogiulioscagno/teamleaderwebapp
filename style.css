@@ -1,0 +1,101 @@
+/* reset */
+* { box-sizing: border-box; margin:0; padding:0; }
+
+body {
+  font-family: sans-serif;
+  max-width: 960px;
+  margin: auto;
+  padding: 16px;
+}
+
+header h1 {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+nav button {
+  padding: 8px 14px;
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+nav button.active,
+nav button:hover {
+  background: #005fa3;
+}
+
+/* sezioni */
+.sec { display: none; }
+.sec.active { display: block; }
+
+/* form Elenco AS */
+#as-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#as-form input {
+  padding: 6px;
+  font-size: 1em;
+}
+
+#as-form button {
+  grid-column: 1 / -1;
+  padding: 8px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+/* tabella Elenco AS */
+#as-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+#as-table th,
+#as-table td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: left;
+  font-size: 0.9em;
+}
+
+#as-table th {
+  background: #f4f4f4;
+}
+
+/* container grafici */
+#chart-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.chart-block {
+  text-align: center;
+}
+
+.chart-block canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.chart-block p {
+  margin-top: 8px;
+  font-size: 0.9em;
+}
