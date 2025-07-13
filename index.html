@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Repository Dipendenti</title>
+  <title>Gestionale Team Leader</title>
   <link href="style.css" rel="stylesheet" type="text/css">
-  <!-- Chart.js CDN -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
   <header>
-    <h1>REPOSITORY DIPENDENTI</h1>
+    <h1>GESTIONALE TEAM LEADER</h1>
     <nav>
       <button id="btn-dipendenti">Dipendenti</button>
       <button id="btn-statistiche">Statistiche</button>
@@ -18,8 +20,9 @@
   </header>
 
   <main>
-    <!-- Sezione Dipendenti -->
     <section id="sez-dipendenti" class="hidden">
+      <!-- form e tabella come prima -->
+      <h2>Elenco Application Specialists</h2>
       <div class="form-row">
         <input id="nome"       placeholder="Nome">
         <input id="cognome"    placeholder="Cognome">
@@ -44,8 +47,8 @@
       </table>
     </section>
 
-    <!-- Sezione Statistiche -->
     <section id="sez-statistiche">
+      <h2>Statistiche</h2>
       <div class="charts">
         <canvas id="chart-sede"></canvas>
         <canvas id="chart-team"></canvas>
@@ -56,6 +59,7 @@
     </section>
   </main>
 
+  <!-- il tuo script.js va per ultimo -->
   <script src="script.js"></script>
 </body>
 </html>
