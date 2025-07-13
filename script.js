@@ -1,126 +1,128 @@
 // ——— CONFIG SUPABASE ———
 const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
-const supabase = supabaseJs.createClient(supabaseUrl, supabaseKey);
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.…TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 // ——— ELEMENTI DOM ———
-const btnStats = document.getElementById('btnStats');
-const btnEmployees = document.getElementById('btnEmployees');
-const secStats = document.getElementById('sectionStats');
-const secEmp   = document.getElementById('sectionEmployees');
-const tblBody  = document.querySelector('#tableEmployees tbody');
-const formAdd  = document.getElementById('formAdd');
+const secStat = document.getElementById('statistiche');
+const secDip  = document.getElementById('dipendenti');
+const btnStat = document.getElementById('btn-statistiche');
+const btnDip  = document.getElementById('btn-dipendenti');
+const tblBody = document.querySelector('#tbl-dipendenti tbody');
+const formDip = document.getElementById('form-dip');
 
-// ——— INIT ———
-window.addEventListener('DOMContentLoaded', () => {
-  // navigazione
-  btnStats.addEventListener('click', () => showSection('stats'));
-  btnEmployees.addEventListener('click', () => showSection('employees'));
-  // form
-  formAdd.addEventListener('submit', onAddEmployee);
-  // apri di default Statistiche
-  showSection('stats');
+// ——— NAVIGAZIONE ———
+btnStat.addEventListener('click', () => {
+  secStat.classList.add('active');
+  secDip.classList.remove('active');
+  caricaStatistiche();
+});
+btnDip.addEventListener('click', () => {
+  secDip.classList.add('active');
+  secStat.classList.remove('active');
+  caricaDipendenti();
 });
 
-// mostra/nasconde sezioni
-function showSection(name) {
-  btnStats.classList.toggle('active', name==='stats');
-  btnEmployees.classList.toggle('active', name==='employees');
-  secStats.classList.toggle('active', name==='stats');
-  secEmp.classList.toggle('active', name==='employees');
-  if (name==='stats') loadStats();
-  else loadEmployees();
-}
+// mostra di default STATISTICHE
+btnStat.click();
 
-// ——— DIPENDENTI ———
-async function loadEmployees() {
+// ——— CARICA/AGGIORNA DIPIENDENTI ———
+async function caricaDipendenti() {
   const { data, error } = await supabase
     .from('application_specialists')
     .select('*');
-  if (error) return alert('Errore caricamento dipendenti.');
+  if (error) return alert('Errore fetch dipendenti');
   tblBody.innerHTML = '';
-  data.forEach(emp => {
+  data.forEach(d => {
     const tr = document.createElement('tr');
-    ['nome','cognome','team','ruolo','sede','contratto','ambito','clienti','stato']
-      .forEach(f => tr.innerHTML += `<td>${emp[f]||''}</td>`);
-    const btn = document.createElement('button');
-    btn.textContent = '❌';
-    btn.classList.add('delete');
-    btn.onclick = () => deleteEmployee(emp.id);
-    tr.appendChild(btn);
+    tr.innerHTML = `
+      <td>${d.nome}</td><td>${d.cognome}</td><td>${d.team}</td>
+      <td>${d.ruolo}</td><td>${d.sede}</td><td>${d.contratto}</td>
+      <td>${d.ambito}</td><td>${d.clienti}</td><td>${d.stato}</td>
+      <td><button class="del-btn" data-id="${d.id}">✕</button></td>
+    `;
     tblBody.appendChild(tr);
   });
 }
 
-async function onAddEmployee(evt) {
-  evt.preventDefault();
-  const vals = ['Nome','Cognome','Team','Ruolo','Sede','Contratto','Ambito','Clienti','Stato']
-    .map((_,i)=>
-      document.getElementById([
-        'inpNome','inpCognome','inpTeam','inpRuolo',
-        'inpSede','inpContratto','inpAmbito','inpClienti','inpStato'
-      ][i]).value.trim()
-    );
-  const [nome,cognome,team,ruolo,sede,contratto,ambito,clienti,stato] = vals;
+// ——— AGGIUNGI NUOVO DIPENDENTE ———
+formDip.addEventListener('submit', async e => {
+  e.preventDefault();
+  const nuovo = {
+    nome:      document.getElementById('input-nome').value,
+    cognome:   document.getElementById('input-cognome').value,
+    team:      document.getElementById('input-team').value,
+    ruolo:     document.getElementById('input-ruolo').value,
+    sede:      document.getElementById('input-sede').value,
+    contratto: document.getElementById('input-contratto').value,
+    ambito:    document.getElementById('input-ambito').value,
+    clienti:   document.getElementById('input-clienti').value,
+    stato:     document.getElementById('input-stato').value
+  };
   const { error } = await supabase
     .from('application_specialists')
-    .insert([{ nome,cognome,team,ruolo,sede,contratto,ambito,clienti,stato }]);
-  if (error) return alert('Errore inserimento.');
-  formAdd.reset();
-  loadEmployees();
-}
+    .insert(nuovo);
+  if (error) return alert('Errore insert');
+  formDip.reset();
+  caricaDipendenti();
+});
 
-async function deleteEmployee(id) {
+// ——— CANCELLA DIPENDENTE ———
+tblBody.addEventListener('click', async e => {
+  if (!e.target.matches('.del-btn')) return;
+  const id = e.target.dataset.id;
   await supabase.from('application_specialists').delete().eq('id', id);
-  loadEmployees();
-}
+  caricaDipendenti();
+});
 
-// ——— STATISTICHE ———
-async function loadStats() {
-  const { data, error } = await supabase
-    .from('application_specialists')
-    .select('sede,team,contratto,ambito,clienti');
-  if (error) return alert('Errore statistiche.');
-  // helper per raggruppare
-  const group = (arr, prop) => {
-    const m = {};
-    arr.forEach(o => {
-      let vals = o[prop] || '';
-      if (prop==='ambito' || prop==='clienti') vals = vals.split(',').map(s=>s.trim());
-      if (!Array.isArray(vals)) vals = [vals];
-      vals.forEach(v => {
-        if (!v) return;
-        m[v] = (m[v]||0) + 1;
-      });
-    });
-    return m;
+// ——— CARICA STATISTICHE ———
+async function caricaStatistiche() {
+  const { data } = await supabase.from('application_specialists').select('*');
+  if (!data) return;
+  const valori = {
+    sede:      {},
+    team:      {},
+    contratto: {},
+    ambito:    {},
+    clienti:   {}
   };
-  // crea grafico
-  function makeChart(id,title,map,colors) {
-    const ctx = document.getElementById(id).getContext('2d');
-    new Chart(ctx, {
+
+  data.forEach(d => {
+    // helper per contare multi‐valore CSV
+    const conta = (obj,key) => obj[key] = (obj[key]||0)+1;
+    conta(valori.sede,      d.sede);
+    conta(valori.team,      d.team);
+    conta(valori.contratto, d.contratto);
+    d.ambito.split(',').forEach(a=>conta(valori.ambito, a.trim()));
+    d.clienti.split(',').forEach(a=>conta(valori.clienti,a.trim()));
+  });
+
+  // distruggi vecchi canvas se esistono
+  if (window._charts) window._charts.forEach(c=>c.destroy());
+  window._charts = [];
+
+  // funzione di utilità per creare un grafico
+  function creaGrafico(ctxId, title, datiObj) {
+    const labels = Object.keys(datiObj);
+    const values = Object.values(datiObj);
+    const colors = ['#e74c3c','#f1c40f','#2ecc71','#3498db','#9b59b6'];
+    const ctx = document.getElementById(ctxId).getContext('2d');
+    const chart = new Chart(ctx, {
       type: 'pie',
-      data: {
-        labels: Object.keys(map),
-        datasets: [{ data: Object.values(map), backgroundColor: colors }]
-      },
+      data: { labels, datasets:[{ data: values, backgroundColor: colors }] },
       options: {
-        plugins:{ title:{ display:true, text:`${title} (${Object.values(map).reduce((a,b)=>a+b,0)} AS)` } }
+        plugins: {
+          title:{ display:true, text:`AS per ${title} (${data.length} AS)` },
+          legend:{ position:'bottom', labels:{ color:'#ccc' }}
+        }
       }
     });
+    window._charts.push(chart);
   }
-  // mappe
-  const mSede      = group(data,'sede');
-  const mTeam      = group(data,'team');
-  const mContratto = group(data,'contratto');
-  const mAmbito    = group(data,'ambito');
-  const mClienti   = group(data,'clienti');
-  // palette base
-  const palette = ['#e74c3c','#f1c40f','#2ecc71','#3498db','#9b59b6','#e67e22'];
-  // disegna
-  makeChart('chartSede','AS per Sede',mSede,palette);
-  makeChart('chartTeam','AS per Team',mTeam,palette);
-  makeChart('chartContratto','AS per Contratto',mContratto,palette);
-  makeChart('chartAmbito','AS per Ambito',mAmbito,palette);
-  makeChart('chartClienti','AS per Clienti',mClienti,palette);
+
+  creaGrafico('chart-sede',      'Sede',      valori.sede);
+  creaGrafico('chart-team',      'Team',      valori.team);
+  creaGrafico('chart-contratto', 'Contratto', valori.contratto);
+  creaGrafico('chart-ambito',    'Ambito',    valori.ambito);
+  creaGrafico('chart-clienti',   'Clienti',   valori.clienti);
 }
