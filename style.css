@@ -1,97 +1,89 @@
 /* reset */
-* { box-sizing: border-box; margin:0; padding:0; }
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
 
 body {
+  font-family: sans-serif;
   background: #111;
   color: #eee;
-  font-family: sans-serif;
+  line-height: 1.5;
 }
 
-header {
-  text-align: center;
-  padding: 16px;
-  border-bottom: 1px solid #555;
-}
-
-h1 {
-  margin-bottom: 12px;
-  font-size: 2rem;
-}
+header { text-align: center; padding: 1rem; }
+header h1 { font-size: 1.8rem; margin-bottom: .5rem; }
 
 nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
+  gap: .5rem;
+  margin-bottom: 1rem;
 }
 
 nav button {
-  padding: 8px 16px;
+  background: #0077cc;
+  color: #fff;
+  border: none;
+  padding: .6rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .9rem;
+}
+nav button:hover { background: #005fa3; }
+
+main > section {
+  display: none;
+  padding: 1rem;
+}
+main > section.active {
+  display: block;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+.form input {
+  flex: 1 1 calc(33% - .5rem);
+  padding: .5rem;
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+.form button {
+  flex: 1 1 100%;
+  padding: .7rem;
   background: #0077cc;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-nav button:hover {
-  background: #005fa3;
-}
-
-main {
-  max-width: 960px;
-  margin: 24px auto;
-  padding: 0 16px;
-}
-
-.section { margin-top: 16px; }
-.hidden  { display: none; }
-
-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
-  gap: 8px;
-  margin-bottom: 16px;
-}
-form input {
-  padding: 8px;
-  border: 1px solid #555;
-  border-radius: 4px;
-  background: #222;
-  color: #eee;
-}
-form button {
-  grid-column: 1 / -1;
-  padding: 12px;
-  background: #0088ff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-form button:hover {
-  background: #006fcc;
+  font-size: 1rem;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 1rem;
 }
-thead th {
+th, td {
+  border: 1px solid #333;
+  padding: .5rem;
   text-align: left;
-  border-bottom: 2px solid #555;
-  padding: 8px;
+  font-size: .9rem;
 }
-tbody td {
-  padding: 8px;
-  border-bottom: 1px solid #333;
-}
-tbody tr:hover {
-  background: #222;
-}
+th { background: #222; }
 
-.chart-grid {
+.charts {
   display: grid;
   grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-  gap: 24px;
-  margin-top: 16px;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.charts canvas {
+  background: #222;
+  border-radius: 4px;
+  padding: .5rem;
 }
