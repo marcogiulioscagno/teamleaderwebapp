@@ -1,32 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Config Supabase
+  // === CONFIGURAZIONE SUPABASE ===
   const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.…TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
   const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // Elementi
-  const statsSec  = document.getElementById('statsSection');
-  const listSec   = document.getElementById('listSection');
-  const btnStats  = document.getElementById('btnStats');
-  const btnList   = document.getElementById('btnList');
-  const btnReport = document.getElementById('btnReport');
-  const listBody  = document.getElementById('listBody');
-  const chartMap  = {};
+  // === ELEMENTI ===
+  const statsSec = document.getElementById('statsSection');
+  const listSec  = document.getElementById('listSection');
+  const btnStats = document.getElementById('btnStats');
+  const btnList  = document.getElementById('btnList');
+  const btnReport= document.getElementById('btnReport');
+  const listBody = document.getElementById('listBody');
 
-  // Mostra sezione e carica dati
-  btnStats.onclick  = () => { show(statsSec);  loadStats();  };
-  btnList.onclick   = () => { show(listSec);   loadList();   };
-  btnReport.onclick = () => { show(statsSec);  generateReport(); };
+  // === NAVIGAZIONE ===
+  btnStats.onclick = () => { show(statsSec);  loadStats(); };
+  btnList.onclick  = () => { show(listSec);   loadList();  };
+  btnReport.onclick= () => { show(statsSec); generateReport(); };
 
   function show(sec) {
     [statsSec, listSec].forEach(s => s.classList.add('hidden'));
     sec.classList.remove('hidden');
   }
 
-  // Default: Mostra Statistiche
+  // all’apertura, mostra statistiche e carica i grafici
   btnStats.click();
 
-  // Aggiungi AS
+  // === ELENCO DIPENDENTI (CRUD) ===
   document.getElementById('btnAdd').onclick = async () => {
     const nuovo = {
       nome:      document.getElementById('inName').value.trim(),
@@ -35,17 +34,18 @@ document.addEventListener('DOMContentLoaded', () => {
       ruolo:     document.getElementById('inRole').value.trim(),
       sede:      document.getElementById('inSede').value.trim(),
       contratto: document.getElementById('inContract').value.trim(),
-      ambito:    document.getElementById('inAmbito').value.split(',').map(s=>s.trim()).filter(s=>s),
-      clienti:   document.getElementById('inClients').value.split(',').map(s=>s.trim()).filter(s=>s),
+      ambito:    document.getElementById('inAmbito').value
+                   .split(',').map(s=>s.trim()).filter(s=>s),
+      clienti:   document.getElementById('inClients').value
+                   .split(',').map(s=>s.trim()).filter(s=>s),
       stato:     document.getElementById('inState').value.trim()
     };
     const { error } = await sb.from('application_specialists').insert(nuovo);
     if (error) return alert(error.message);
-    document.querySelectorAll('.form-row input').forEach(i=>i.value='');
+    document.querySelectorAll('input').forEach(i=>i.value='');
     loadList();
   };
 
-  // Carica elenco AS
   async function loadList() {
     listBody.innerHTML = '';
     const { data, error } = await sb
@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${r.ruolo}</td><td>${r.sede}</td><td>${r.contratto}</td>
         <td>${Array.isArray(r.ambito)? r.ambito.join(', '): r.ambito}</td>
         <td>${Array.isArray(r.clienti)? r.clienti.join(', '): r.clienti}</td>
-        <td>${r.stato}</td><td><button data-id="${r.id}">✕</button></td>`;
+        <td>${r.stato}</td>
+        <td><button data-id="${r.id}">X</button></td>
+      `;
       tr.querySelector('button').onclick = () => deleteAS(r.id);
       listBody.appendChild(tr);
     });
@@ -73,7 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loadList();
   }
 
-  // Carica Statistiche
+  // === STATISTICHE ===
+  const chartMap = {};
   async function loadStats() {
     const { data, error } = await sb
       .from('application_specialists')
@@ -99,9 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderPie(id, title, dataObj) {
     const ctx = document.getElementById(id).getContext('2d');
     if (chartMap[id]) chartMap[id].destroy();
-    const labels = Object.keys(dataObj),
-          vals   = Object.values(dataObj),
-          cols   = labels.map((_,i)=>`hsl(${i*360/labels.length},70%,60%)`);
+    const labels = Object.keys(dataObj);
+    const vals   = Object.values(dataObj);
+    const cols   = labels.map((_,i) => `hsl(${i*360/labels.length},70%,60%)`);
     chartMap[id] = new Chart(ctx, {
       type: 'pie',
       data: { labels, datasets: [{ data: vals, backgroundColor: cols }] },
@@ -114,27 +117,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Genera PDF con i grafici già renderizzati
+  // === REPORT PDF ===
   async function generateReport() {
+    // assicuriamoci grafici aggiornati
     await loadStats();
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p','pt','a4');
     const canvases = ['chartSede','chartTeam','chartContract','chartAmbito','chartClients'];
-    const margin = 20;
     const pageW = pdf.internal.pageSize.getWidth();
-    let y = margin;
+    let y = 20;
 
-    canvases.forEach((id,i) => {
-      const chart = chartMap[id];
-      if (!chart) return;
-      const img = chart.toBase64Image();
-      const w = pageW - margin*2;
-      const h = chart.canvas.height * (w / chart.canvas.width);
-      if (i>0) { pdf.addPage(); y = margin; }
-      pdf.addImage(img, 'PNG', margin, y, w, h);
-      y += h + margin;
-    });
-
+    for (let i = 0; i < canvases.length; i++) {
+      const c = document.getElementById(canvases[i]);
+      const img = c.toDataURL('image/png');
+      const w = pageW - 40;
+      const h = (c.height * w) / c.width;
+      if (i > 0) pdf.addPage();
+      pdf.addImage(img, 'PNG', 20, y, w, h);
+    }
     pdf.save('report_statistiche.pdf');
   }
 });
