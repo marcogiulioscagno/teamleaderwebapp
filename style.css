@@ -29,9 +29,7 @@ nav button {
   border-radius: 4px;
   cursor: pointer;
 }
-nav button:hover {
-  background: #005fa3;
-}
+nav button:hover { background: #005fa3; }
 
 .hidden { display: none; }
 
@@ -80,9 +78,7 @@ hr {
   cursor: pointer;
   margin-bottom: 16px;
 }
-#btnAdd:hover {
-  background: #0077dd;
-}
+#btnAdd:hover { background: #0077dd; }
 
 table {
   width: 100%;
@@ -93,12 +89,8 @@ thead th, tbody td {
   padding: 6px;
   font-size: .9rem;
 }
-thead th {
-  background: #222;
-}
-tbody tr:hover {
-  background: #1a1a1a;
-}
+thead th { background: #222; }
+tbody tr:hover { background: #1a1a1a; }
 tbody td button {
   background: #cc0000;
   color: #fff;
@@ -107,6 +99,4 @@ tbody td button {
   border-radius: 4px;
   cursor: pointer;
 }
-tbody td button:hover {
-  background: #aa0000;
-}
+tbody td button:hover { background: #aa0000; }
