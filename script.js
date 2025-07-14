@@ -1,31 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // — CONFIG SUPABASE —
+  // === CONFIG SUPABASE ===
   const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.…TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
+  const sb = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // — ELEMENTI —
-  const statsSec  = document.getElementById('statsSection');
-  const listSec   = document.getElementById('listSection');
-  const btnStats  = document.getElementById('btnStats');
-  const btnList   = document.getElementById('btnList');
-  const btnReport = document.getElementById('btnReport');
-  const listBody  = document.getElementById('listBody');
-  const chartMap  = {};
-
-  // — NAVIGAZIONE —
-  btnStats.onclick  = () => { show(statsSec); loadStats(); };
-  btnList.onclick   = () => { show(listSec);  loadList();  };
-  btnReport.onclick = () => { show(statsSec); generateReport(); };
+  // === SEZIONI & BOTTONI NAV ===
+  const homeSec  = document.getElementById('homeSection');
+  const listSec  = document.getElementById('listSection');
+  const statsSec = document.getElementById('statsSection');
+  const btnStats = document.getElementById('btnStats');
+  const btnList  = document.getElementById('btnList');
+  const btnReport= document.getElementById('btnReport');
+  const listBody = document.getElementById('listBody');
+  const chartMap = {};
 
   function show(sec) {
-    [statsSec, listSec].forEach(s => s.classList.add('hidden'));
+    [homeSec, listSec, statsSec].forEach(s => s.classList.add('hidden'));
     sec.classList.remove('hidden');
   }
-  // di default mostriamo subito le Statistiche
+
+  // NAVIGAZIONE
+  btnStats.onclick  = () => { show(statsSec);  loadStats();  };
+  btnList.onclick   = () => { show(listSec);   loadList();   };
+  btnReport.onclick = () => { show(statsSec);  generateReport(); };
+
+  // default: STATISTICHE
   btnStats.click();
 
-  // — DIPENDENTI CRUD —
+  // === DIPENDENTI (CRUD) ===
   document.getElementById('btnAdd').onclick = async () => {
     const nuovo = {
       nome:      document.getElementById('inName').value.trim(),
@@ -38,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clienti:   document.getElementById('inClients').value.split(',').map(s=>s.trim()).filter(s=>s),
       stato:     document.getElementById('inState').value.trim()
     };
-    const { error } = await supabase.from('application_specialists').insert(nuovo);
+    const { error } = await sb.from('application_specialists').insert(nuovo);
     if (error) return alert(error.message);
     document.querySelectorAll('.form-row input').forEach(i=>i.value='');
     loadList();
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadList() {
     listBody.innerHTML = '';
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('application_specialists')
       .select('*')
       .order('created_at', { ascending: false });
@@ -59,8 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${Array.isArray(r.ambito)? r.ambito.join(', '): r.ambito}</td>
         <td>${Array.isArray(r.clienti)? r.clienti.join(', '): r.clienti}</td>
         <td>${r.stato}</td>
-        <td><button data-id="${r.id}">✕</button></td>
-      `;
+        <td><button data-id="${r.id}">X</button></td>`;
       tr.querySelector('button').onclick = () => deleteAS(r.id);
       listBody.appendChild(tr);
     });
@@ -68,14 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function deleteAS(id) {
     if (!confirm('Eliminare questo AS?')) return;
-    const { error } = await supabase.from('application_specialists').delete().eq('id', id);
+    const { error } = await sb.from('application_specialists').delete().eq('id', id);
     if (error) return alert(error.message);
     loadList();
   }
 
-  // — STATISTICHE E GRAFICI —
+  // === STATISTICHE (Chart) ===
   async function loadStats() {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('application_specialists')
       .select('sede,team,contratto,ambito,clienti');
     if (error) return alert(error.message);
@@ -114,26 +115,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // — GENERA REPORT PDF —
+  // === GENERAZIONE REPORT PDF ===
   async function generateReport() {
-    // ricarica i grafici
+    // ricarica statistiche
     await loadStats();
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p','pt','a4');
     const canvases = ['chartSede','chartTeam','chartContract','chartAmbito','chartClients'];
-    const margin = 20;
-    const pageW = pdf.internal.pageSize.getWidth();
-    let y = margin;
-    for (let i = 0; i < canvases.length; i++) {
-      const chart = chartMap[canvases[i]];
-      if (!chart) continue;
+    const m = 20;
+    const w = pdf.internal.pageSize.getWidth() - m*2;
+    let y = m;
+
+    canvases.forEach((id, i) => {
+      const chart = chartMap[id];
+      if (!chart) return;
       const img = chart.toBase64Image();
-      const w = pageW - margin*2;
       const h = chart.canvas.height * (w / chart.canvas.width);
-      if (i > 0) { pdf.addPage(); y = margin; }
-      pdf.addImage(img, 'PNG', margin, y, w, h);
-      y += h + margin;
-    }
+      if (i>0) { pdf.addPage(); y = m; }
+      pdf.addImage(img, 'PNG', m, y, w, h);
+      y += h + m;
+    });
+
     pdf.save('report_statistiche.pdf');
   }
 });
