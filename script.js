@@ -1,18 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // === CONFIGURAZIONE SUPABASE ===
+  // — CONFIG SUPABASE —
   const supabaseUrl = 'https://fzbpucvscnfyimefrvzs.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ6YnB1Y3ZzY25meWltZWZydnpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0MjIwMDUsImV4cCI6MjA2Nzk5ODAwNX0.TmDOR-UnkeSkTnnEQuuYTHchmwfdNGO9rnrmXu9akuM';
   const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // === ELEMENTI ===
+  // — ELEMENTI —
   const statsSec  = document.getElementById('statsSection');
   const listSec   = document.getElementById('listSection');
   const btnStats  = document.getElementById('btnStats');
   const btnList   = document.getElementById('btnList');
   const btnReport = document.getElementById('btnReport');
   const listBody  = document.getElementById('listBody');
+  const chartMap  = {};
 
-  // === NAVIGAZIONE ===
+  // — NAVIGAZIONE —
   btnStats.onclick  = () => { show(statsSec); loadStats(); };
   btnList.onclick   = () => { show(listSec);  loadList();  };
   btnReport.onclick = () => { show(statsSec); generateReport(); };
@@ -21,10 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
     [statsSec, listSec].forEach(s => s.classList.add('hidden'));
     sec.classList.remove('hidden');
   }
-  // mostra subito le statistiche
+  // di default mostriamo subito le Statistiche
   btnStats.click();
 
-  // === DIPENDENTI CRUD ===
+  // — DIPENDENTI CRUD —
   document.getElementById('btnAdd').onclick = async () => {
     const nuovo = {
       nome:      document.getElementById('inName').value.trim(),
@@ -37,9 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clienti:   document.getElementById('inClients').value.split(',').map(s=>s.trim()).filter(s=>s),
       stato:     document.getElementById('inState').value.trim()
     };
-    const { error } = await supabase
-      .from('application_specialists')
-      .insert(nuovo);
+    const { error } = await supabase.from('application_specialists').insert(nuovo);
     if (error) return alert(error.message);
     document.querySelectorAll('.form-row input').forEach(i=>i.value='');
     loadList();
@@ -60,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${Array.isArray(r.ambito)? r.ambito.join(', '): r.ambito}</td>
         <td>${Array.isArray(r.clienti)? r.clienti.join(', '): r.clienti}</td>
         <td>${r.stato}</td>
-        <td><button data-id="${r.id}">X</button></td>
+        <td><button data-id="${r.id}">✕</button></td>
       `;
       tr.querySelector('button').onclick = () => deleteAS(r.id);
       listBody.appendChild(tr);
@@ -69,15 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function deleteAS(id) {
     if (!confirm('Eliminare questo AS?')) return;
-    const { error } = await supabase
-      .from('application_specialists')
-      .delete().eq('id', id);
+    const { error } = await supabase.from('application_specialists').delete().eq('id', id);
     if (error) return alert(error.message);
     loadList();
   }
 
-  // === STATISTICHE E GRAFICI ===
-  const chartMap = {};
+  // — STATISTICHE E GRAFICI —
   async function loadStats() {
     const { data, error } = await supabase
       .from('application_specialists')
@@ -118,9 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === GENERA REPORT PDF ===
+  // — GENERA REPORT PDF —
   async function generateReport() {
-    // ricarica i grafici per essere sicuri di avere l’ultimo snapshot
+    // ricarica i grafici
     await loadStats();
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('p','pt','a4');
@@ -128,14 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const margin = 20;
     const pageW = pdf.internal.pageSize.getWidth();
     let y = margin;
-
     for (let i = 0; i < canvases.length; i++) {
-      const canvas = document.getElementById(canvases[i]);
-      const imgData = canvas.toDataURL('image/png');
+      const chart = chartMap[canvases[i]];
+      if (!chart) continue;
+      const img = chart.toBase64Image();
       const w = pageW - margin*2;
-      const h = (canvas.height * w) / canvas.width;
-      if (i > 0) pdf.addPage(), y = margin;
-      pdf.addImage(imgData, 'PNG', margin, y, w, h);
+      const h = chart.canvas.height * (w / chart.canvas.width);
+      if (i > 0) { pdf.addPage(); y = margin; }
+      pdf.addImage(img, 'PNG', margin, y, w, h);
       y += h + margin;
     }
     pdf.save('report_statistiche.pdf');
