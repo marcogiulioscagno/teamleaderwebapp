@@ -1,59 +1,52 @@
 /* reset */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
 
 body {
+  font-family: sans-serif;
   background: #111;
   color: #eee;
-  font-family: sans-serif;
-  max-width: 960px;
-  margin: auto;
   padding: 16px;
 }
 
-header h1 {
-  text-align: center;
-  margin-bottom: 8px;
-}
+header { text-align: center; margin-bottom: 24px; }
+h1 { margin-bottom: 12px; font-size: 1.8rem; }
 
 nav {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 nav button {
-  padding: 8px 14px;
   background: #0077cc;
   color: #fff;
   border: none;
+  padding: 8px 14px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: .9rem;
 }
 nav button:hover { background: #005fa3; }
 
 .hidden { display: none; }
 
-hr {
-  border: none;
-  border-bottom: 1px solid #444;
-  margin-bottom: 16px;
-}
-
-/* Chart layout */
+/* Statistiche */
 .chart-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 24px;
 }
 .chart-row canvas {
   background: #222;
   border-radius: 8px;
   padding: 8px;
-  flex: 1 1 300px;
+  max-width: 300px;
+  width: 100%;
 }
 
-/* Form & table Dipendenti */
+/* Dipendenti */
 .form-row {
   display: flex;
   gap: 8px;
