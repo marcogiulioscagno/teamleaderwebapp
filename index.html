@@ -2,15 +2,18 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Repository Dipendenti</title>
-  <link href="style.css" rel="stylesheet" />
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- html2canvas per catturare i canvases -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>REPOSITORY DIPENDENTI</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Supabase UMD client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+  <!-- Chart.js UMD -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
   <!-- jsPDF per generare il PDF -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <!-- Il tuo script -->
+  <script src="script.js" defer></script>
 </head>
 <body>
   <header>
@@ -23,41 +26,34 @@
     <hr/>
   </header>
 
-  <!-- Sezione STATISTICHE -->
+  <!-- STATISTICHE -->
   <section id="statsSection">
     <h2>Statistiche</h2>
-    <div class="chart-card">
-      <canvas id="chartSede"></canvas>
-    </div>
-    <div class="chart-card">
-      <canvas id="chartTeam"></canvas>
-    </div>
-    <div class="chart-card">
-      <canvas id="chartContract"></canvas>
-    </div>
-    <div class="chart-card">
-      <canvas id="chartAmbito"></canvas>
-    </div>
-    <div class="chart-card">
-      <canvas id="chartClients"></canvas>
-    </div>
+    <div class="chart-row"><canvas id="chartSede"></canvas><canvas id="chartTeam"></canvas></div>
+    <div class="chart-row"><canvas id="chartContract"></canvas><canvas id="chartAmbito"></canvas></div>
+    <div class="chart-row"><canvas id="chartClients"></canvas></div>
   </section>
 
-  <!-- Sezione DIPENDENTI -->
+  <!-- DIPENDENTI -->
   <section id="listSection" class="hidden">
     <h2>Elenco Application Specialists</h2>
-    <div class="form-grid">
-      <input id="inName"     placeholder="Nome" />
-      <input id="inSurname"  placeholder="Cognome" />
-      <input id="inTeam"     placeholder="Team" />
-      <input id="inRole"     placeholder="Ruolo" />
-      <input id="inSede"     placeholder="Sede" />
-      <input id="inContract" placeholder="Contratto" />
-      <input id="inAmbito"   placeholder="Ambito (csv)" />
-      <input id="inClients"  placeholder="Clienti (csv)" />
-      <input id="inState"    placeholder="Stato" />
+    <div class="form-row">
+      <input id="inName"     placeholder="Nome">
+      <input id="inSurname"  placeholder="Cognome">
+      <input id="inTeam"     placeholder="Team">
     </div>
-    <button id="btnAdd" class="add-btn">Aggiungi AS</button>
+    <div class="form-row">
+      <input id="inRole"       placeholder="Ruolo">
+      <input id="inSede"       placeholder="Sede">
+      <input id="inContract"   placeholder="Contratto">
+    </div>
+    <div class="form-row">
+      <input id="inAmbito"     placeholder="Ambito (csv)">
+      <input id="inClients"    placeholder="Clienti (csv)">
+      <input id="inState"      placeholder="Stato">
+    </div>
+    <button id="btnAdd">Aggiungi AS</button>
+
     <table>
       <thead>
         <tr>
@@ -68,7 +64,5 @@
       <tbody id="listBody"></tbody>
     </table>
   </section>
-
-  <script src="script.js"></script>
 </body>
 </html>
