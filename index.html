@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>REPOSITORY DIPENDENTI</title>
-  <link rel="stylesheet" href="style.css">
+  <link href="style.css" rel="stylesheet" />
 
   <!-- Supabase UMD client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
   <!-- Chart.js UMD -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
-  <!-- jsPDF UMD -->
+  <!-- jsPDF UMD per il PDF -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <!-- Il tuo script -->
   <script src="script.js" defer></script>
@@ -46,9 +46,9 @@
   <section id="listSection" class="hidden">
     <h2>Elenco Application Specialists</h2>
     <div class="form-row">
-      <input id="inName"     placeholder="Nome">
-      <input id="inSurname"  placeholder="Cognome">
-      <input id="inTeam"     placeholder="Team">
+      <input id="inName"       placeholder="Nome">
+      <input id="inSurname"    placeholder="Cognome">
+      <input id="inTeam"       placeholder="Team">
     </div>
     <div class="form-row">
       <input id="inRole"       placeholder="Ruolo">
@@ -61,7 +61,6 @@
       <input id="inState"      placeholder="Stato">
     </div>
     <button id="btnAdd">Aggiungi AS</button>
-
     <table>
       <thead>
         <tr>
